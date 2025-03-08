@@ -11,6 +11,6 @@
 #include "../include/lox.h"
 
 int main(const int argc, char *argv[]) {
-    Lox().main(argc, argv);
+    lox::Lox::main(argc, argv);
     return 0;
 }
