@@ -10,6 +10,8 @@ namespace lox {
     public:
         static void main(int argc, char *argv[]);
 
+        static void error(int line, const std::string &message);
+
     private:
         static bool hadError;
 
@@ -19,7 +21,6 @@ namespace lox {
 
         static void run(const std::string &input);
 
-        static void error(int line, const std::string &message);
 
         static void report(int line, const std::string &where, const std::string &message);
     };

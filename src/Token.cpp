@@ -10,7 +10,7 @@
 #include <sstream>
 
 namespace lox {
-    Token::Token(const lox::TokenType type, std::string lexeme, Literal literal, const int line) : type(type),
+    Token::Token(const TokenType type, std::string lexeme, Literal literal, const int line) : type(type),
         lexeme(std::move(lexeme)),
         literal(std::move(literal)), line(line) {
     }
