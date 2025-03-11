@@ -9,6 +9,8 @@
 #include <iostream>
 #include <sstream>
 
+#include "../include/Scanner.h"
+
 namespace lox {
     void Lox::main(const int argc, char *argv[]) {
         if (argc > 2) {
@@ -50,7 +52,7 @@ namespace lox {
         auto scanner = Scanner(input);
 
         for (auto tokens = scanner.scanTokens(); const auto &token: tokens) {
-            std::cout << token;
+            std::cout << token << "\n";
         }
     }
 

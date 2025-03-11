@@ -19,17 +19,27 @@ namespace lox {
         std::ostringstream oss;
         oss << tokenTypeToString(type) << " " << lexeme << " ";
 
-        std::visit([&oss]<typename T>(T &&arg) {
-            using T = std::decay_t<T>;
-            if constexpr (std::is_same_v<T, std::monostate>) {
-                oss << "null";
-            } else if constexpr (std::is_same_v<std::decay_t<T>, std::string> ||
-                                 std::is_same_v<std::decay_t<T>, double>) {
-                oss << arg;
-            } else if constexpr (std::is_same_v<T, bool>) {
-                oss << (arg ? "true" : "false");
-            }
-        }, literal);
+        switch (type) {
+            case IDENTIFIER:
+                oss << lexeme;
+                break;
+            case STRING:
+                oss << std::get<std::string>(literal);
+                break;
+            case NUMBER:
+                oss << std::get<double>(literal);
+                break;
+            case TRUE:
+                oss << "true";
+                break;
+            case FALSE:
+                oss << "false";
+                break;
+            default:
+                oss << "nil";
+                break;
+        }
+
 
         return oss.str();
     }
