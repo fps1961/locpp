@@ -7,7 +7,7 @@
 #include <iostream>
 #include <unordered_map>
 
-#include "../include/lox.h"
+#include "../include/Lox.h"
 
 namespace lox {
     Scanner::Scanner(std::string source) : source(std::move(source)) {

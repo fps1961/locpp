@@ -14,6 +14,9 @@ file(GLOB_RECURSE SOURCES src/*.cpp include/*.h)
 
 add_executable(locpp ${SOURCES})
 
+add_executable(generate_ast scripts/GenerateAst.cpp)
+
+
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     target_compile_options(locpp PRIVATE -g)
 endif ()

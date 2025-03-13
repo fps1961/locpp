@@ -3,7 +3,7 @@
 //
 
 
-#include "../include/lox.h"
+#include "../include/Lox.h"
 
 #include <fstream>
 #include <iostream>
