@@ -3,6 +3,7 @@
 #include <sstream>
 #include <string.h>
 #include <vector>
+#include <algorithm>
 //
 // Created by shesh on 3/11/2025.
 //
@@ -60,44 +61,67 @@ std::vector<Field> extractFields(const std::string &definition) {
 
 void defineType(std::ofstream &writer, const std::string &baseName, const std::string &className,
                 const std::vector<Field> &fields) {
-    writer << "class " << className << " : " << baseName << " {" << "\n";
+    writer << "class " << className << " final : public " << baseName << " {\n";
+
+    // Fields with shared_ptr
+    for (const auto &[type, name]: fields) {
+        std::string fieldType = type;
+        if (fieldType == baseName) {
+            fieldType = "std::shared_ptr<" + baseName + ">";
+        }
+        writer << "    " << fieldType << " " << name << ";\n";
+    }
+
+    writer << "\npublic:\n";
+
+    // Constructor
+    writer << "    " << (fields.size() == 1 ? "explicit " : "") << className << "(";
+    for (size_t i = 0; i < fields.size(); ++i) {
+        std::string fieldType = fields[i].type;
+        if (fieldType == baseName) {
+            fieldType = "std::shared_ptr<" + baseName + ">";
+        }
+        writer << fieldType << " " << fields[i].name;
+        if (i != fields.size() - 1) {
+            writer << ", ";
+        }
+    }
+    writer << ")\n        : ";
+
+    // Constructor initialization
+    for (size_t i = 0; i < fields.size(); ++i) {
+        const auto &name = fields[i].name;
+        writer << name << "(std::move(" << name << "))";
+        if (i != fields.size() - 1) {
+            writer << ", ";
+        } else {
+            writer << " {}\n\n";
+        }
+    }
+
+    // Accept method
+    writer << "    void accept(Visitor& visitor) const override {\n";
+    writer << "        visitor.visit" << className << baseName << "(*this);\n";
+    writer << "    }\n\n";
 
     for (const auto &[type, name]: fields) {
-        writer << type << " " << name << ";" << "\n";
-    }
-
-    writer << "\n" << "public: \n";
-
-    writer << className << "(";
-
-    for (size_t i = 0; i < fields.size(); ++i) {
-        const auto &type = fields[i].type;
-        const auto &name = fields[i].name;
-        writer << type << " " << name;
-        if (i != fields.size() - 1) {
-            writer << ",";
+        if (std::string fieldType = type; fieldType == baseName) {
+            writer << "[[nodiscard]] const std::shared_ptr<" << baseName << ">& get"
+                    << std::string(1, static_cast<char>(std::toupper(name[0]))) << name.substr(1)
+                    << "() const { return " << name << "; }\n";
         } else {
-            writer << ") : ";
+            writer << "[[nodiscard]] const " << fieldType << "& get"
+                    << std::string(1, static_cast<char>(std::toupper(name[0]))) << name.substr(1)
+                    << "() const { return " << name << "; }\n";
         }
     }
 
-    for (size_t i = 0; i < fields.size(); ++i) {
-        const auto &name = fields[i].name;
-        writer << name << "(" << name << ")";
-
-        if (i != fields.size() - 1) {
-            writer << ",";
-        } else {
-            writer << "\n{}\n";
-        }
-    }
-
-    writer << "};" << "\n\n";
+    writer << "};\n\n";
 }
 
 std::string getLowerCased(const std::string &str) {
     std::string result = str;
-    std::transform(result.begin(), result.end(), result.begin(), ::tolower);
+    std::ranges::transform(result, result.begin(), [](unsigned char c) { return std::tolower(c); });
     return result;
 }
 
@@ -122,11 +146,15 @@ void defineVisitor(std::ofstream &writer, const std::string &baseName, const std
 
 
 void defineAst(const std::string &outputDir, const std::string &basename, const std::vector<std::string> &types) {
-    const std::string path = outputDir + "/" + basename + ".cpp";
+    const std::string path = outputDir + "/" + basename + ".h";
     std::ofstream writer{path};
-
+    writer << "#pragma once\n#include <memory>\n#include <variant>\n#include \"../include/Token.h\"\n";
     writer << "namespace lox {" << "\n";
 
+    for (const auto &type: types) {
+        std::string className = extractClassName(type);
+        writer << "class " << className << ";\n";
+    }
     defineVisitor(writer, basename, types);
 
     for (const auto &type: types) {

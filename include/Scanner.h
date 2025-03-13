@@ -53,6 +53,6 @@ namespace lox {
 
         void addToken(TokenType tokenType);
 
-        void addToken(TokenType token, const Literal &literal);
+        void addToken(TokenType token, const TokenLiteral &literal);
     };
 }

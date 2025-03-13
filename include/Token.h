@@ -10,16 +10,20 @@
 #include "TokenType.h"
 
 namespace lox {
-    using Literal = std::variant<std::monostate, std::string, double, bool>;
+    using TokenLiteral = std::variant<std::monostate, std::string, double, bool>;
 
     class Token {
         TokenType type;
         std::string lexeme;
-        Literal literal;
+        TokenLiteral literal;
         int line;
 
     public:
-        Token(TokenType type, std::string lexeme, Literal literal, int line);
+        Token(TokenType type, std::string lexeme, TokenLiteral literal, int line);
+
+        [[nodiscard]] const std::string &getLexeme() const {
+            return lexeme;
+        }
 
         [[nodiscard]] std::string toString() const;
 

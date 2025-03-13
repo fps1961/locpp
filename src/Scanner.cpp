@@ -158,7 +158,7 @@ namespace lox {
         addToken(tokenType, std::monostate{});
     }
 
-    void Scanner::addToken(TokenType token, const Literal &literal) {
+    void Scanner::addToken(TokenType token, const TokenLiteral &literal) {
         std::string text = source.substr(start, current - start);
         tokens.emplace_back(token, text, literal, line);
     }
