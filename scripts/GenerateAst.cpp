@@ -121,7 +121,7 @@ void defineType(std::ofstream &writer, const std::string &baseName, const std::s
 
 std::string getLowerCased(const std::string &str) {
     std::string result = str;
-    std::ranges::transform(result, result.begin(), [](unsigned char c) { return std::tolower(c); });
+    std::ranges::transform(result, result.begin(), [](const unsigned char c) { return std::tolower(c); });
     return result;
 }
 

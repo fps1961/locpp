@@ -15,6 +15,19 @@ namespace lox {
         literal(std::move(literal)), line(line) {
     }
 
+    const std::string &Token::getLexeme() const {
+        return lexeme;
+    }
+
+    const TokenType &Token::getTokenType() const {
+        return type;
+    }
+
+    const TokenLiteral &Token::getLiteral() const {
+        return literal;
+    }
+
+
     std::string Token::toString() const {
         std::ostringstream oss;
         oss << tokenTypeToString(type) << " " << lexeme << " ";
@@ -43,7 +56,6 @@ namespace lox {
 
         return oss.str();
     }
-
 
     std::ostream &operator<<(std::ostream &os, const Token &token) {
         return os << token.toString();

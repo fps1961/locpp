@@ -25,10 +25,10 @@ public:
     void visitLiteralExpr(const lox::Literal &expr) override {
         //create a temp visitor struct so we can overload the () operator which is then called when we do std::visit
         struct TempLiteralVisitor {
-            std::string operator()(std::nullptr_t) const { return "nil"; }
-            std::string operator()(const bool value) const { return value ? "true" : "false"; }
-            std::string operator()(const double value) const { return std::to_string(value); }
-            std::string operator()(const std::string &value) const { return value; }
+            std::string operator()(std::monostate) const { return "nil"; }
+            std::string operator()(const std::string &s) const { return s; }
+            std::string operator()(const double d) const { return std::to_string(d); }
+            std::string operator()(const bool b) const { return b ? "true" : "false"; }
         };
         result = std::visit(TempLiteralVisitor{}, expr.getValue());
     }
