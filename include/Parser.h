@@ -14,7 +14,18 @@ namespace lox {
     public:
         explicit Parser(const std::vector<Token> &tokens);
 
+        std::shared_ptr<Expr> parse();
+
     private:
+        class ParseError final : public std::runtime_error {
+        public:
+            ParseError() : std::runtime_error("Parse Error") {
+            };
+
+            explicit ParseError(const std::string &message) : std::runtime_error(message) {
+            };
+        };
+
         const std::vector<Token> &tokens{};
         int current{0};
 
@@ -43,6 +54,8 @@ namespace lox {
             return false;
         }
 
+        Token consume(TokenType tokenType, std::string message);
+
         bool check(TokenType tokenType) const;
 
         Token advance();
@@ -52,5 +65,9 @@ namespace lox {
         Token peek() const;
 
         Token previous() const;
+
+        ParseError error(const Token &token, const std::string &message);
+
+        void synchronize();
     };
 }

@@ -27,6 +27,10 @@ namespace lox {
         return literal;
     }
 
+    int Token::getLine() const {
+        return line;
+    }
+
 
     std::string Token::toString() const {
         std::ostringstream oss;

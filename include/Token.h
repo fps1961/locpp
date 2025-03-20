@@ -27,6 +27,8 @@ namespace lox {
 
         [[nodiscard]] const TokenLiteral &getLiteral() const;
 
+        [[nodiscard]] int getLine() const;
+
         [[nodiscard]] std::string toString() const;
 
         friend std::ostream &operator<<(std::ostream &os, const Token &token);

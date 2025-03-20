@@ -9,7 +9,10 @@
 #include <iostream>
 #include <sstream>
 
+#include "../include/Parser.h"
 #include "../include/Scanner.h"
+#include "../scripts/AstPrinter/AstPrinter.h"
+
 
 namespace lox {
     void Lox::main(const int argc, char *argv[]) {
@@ -49,11 +52,14 @@ namespace lox {
     }
 
     void Lox::run(const std::string &input) {
-        auto scanner = Scanner(input);
+        Scanner scanner{input};
+        const std::vector<Token> tokens = scanner.scanTokens();
+        Parser parser{tokens};
+        const std::shared_ptr<Expr> expression = parser.parse();
 
-        for (auto tokens = scanner.scanTokens(); const auto &token: tokens) {
-            std::cout << token << "\n";
-        }
+        if (hadError) return;
+
+        std::cout << AstPrinter{}.print(expression) << "\n";
     }
 
     void Lox::error(const int line, const std::string &message) {
@@ -65,6 +71,15 @@ namespace lox {
         std::cerr << "[line " << line << "] Error" << where << ": " << message << std::endl;
         hadError = true;
     }
+
+    void Lox::error(const Token &token, const std::string &message) {
+        if (token.getTokenType() == EOF) {
+            report(token.getLine(), " at end", message);
+        } else {
+            report(token.getLine(), " at '" + token.getLexeme() + "'", message);
+        }
+    }
+
 
     bool Lox::hadError = false;
 }

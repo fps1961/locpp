@@ -18,7 +18,7 @@ add_library(locpp_lib ${SOURCES})
 add_executable(locpp src/main.cpp)
 target_link_libraries(locpp PRIVATE locpp_lib)
 
-add_executable(print_ast scripts/AstPrinter.cpp)
+add_executable(print_ast scripts/AstPrinter/AstPrinter.cpp scripts/AstPrinter/AstPrinter.h)
 target_link_libraries(print_ast PRIVATE locpp_lib)
 
 add_executable(generate_ast scripts/GenerateAst.cpp)

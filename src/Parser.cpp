@@ -5,9 +5,20 @@
 
 #include "../include/Parser.h"
 
+#include "../include/Error.h"
+#include "../include/Lox.h"
+
 namespace lox {
     Parser::Parser(const std::vector<Token> &tokens) : tokens(tokens) {
     };
+
+    std::shared_ptr<Expr> Parser::parse() {
+        try {
+            return expression();
+        } catch (ParseError error) {
+            return nullptr;
+        }
+    }
 
 
     std::shared_ptr<Expr> Parser::expression() {
@@ -79,6 +90,15 @@ namespace lox {
             consume(RIGHT_PAREN, "Expect ')' after expression.");
             return std::make_shared<Grouping>(expr);
         }
+
+        throw error(peek(), "Expect expression");
+    }
+
+
+    Token Parser::consume(TokenType tokenType, std::string message) {
+        if (check(tokenType)) return advance();
+
+        throw error(peek(), message);
     }
 
 
@@ -102,5 +122,32 @@ namespace lox {
 
     Token Parser::previous() const {
         return tokens.at(current - 1);
+    }
+
+    Parser::ParseError Parser::error(const Token &token, const std::string &message) {
+        Lox::error(token, message);
+        return ParseError{""};
+    }
+
+    void Parser::synchronize() {
+        advance();
+
+        while (!isAtEnd()) {
+            if (previous().getTokenType() == SEMICOLON) return;
+
+            switch (peek().getTokenType()) {
+                case CLASS:
+                case FUN:
+                case VAR:
+                case FOR:
+                case IF:
+                case WHILE:
+                case PRINT:
+                case RETURN:
+                    return;
+                default:
+                    advance();
+            }
+        }
     }
 }
