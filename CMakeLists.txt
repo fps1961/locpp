@@ -10,7 +10,7 @@ if (CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
     add_compile_options(-Wall -Wextra -Wpedantic -Werror)
 endif ()
 
-file(GLOB_RECURSE SOURCES src/*.cpp include/*.h)
+file(GLOB_RECURSE SOURCES src/*.cpp scripts/AstPrinter/AstPrinter.cpp include/*.h)
 list(REMOVE_ITEM SOURCES ${CMAKE_SOURCE_DIR}/src/main.cpp)
 
 add_library(locpp_lib ${SOURCES})
@@ -18,7 +18,7 @@ add_library(locpp_lib ${SOURCES})
 add_executable(locpp src/main.cpp)
 target_link_libraries(locpp PRIVATE locpp_lib)
 
-add_executable(print_ast scripts/AstPrinter/AstPrinter.cpp scripts/AstPrinter/AstPrinter.h)
+add_executable(print_ast scripts/AstPrinter/main.cpp scripts/AstPrinter/AstPrinter.cpp scripts/AstPrinter/AstPrinter.h)
 target_link_libraries(print_ast PRIVATE locpp_lib)
 
 add_executable(generate_ast scripts/GenerateAst.cpp)
@@ -36,4 +36,8 @@ add_test(NAME TestTokenization1
 
 add_test(NAME TestTokenization2
         COMMAND bash -c "${CMAKE_BINARY_DIR}/locpp ${CMAKE_CURRENT_SOURCE_DIR}/tests/TestTokenization2.lox> actual_output.txt && diff -u actual_output.txt ${CMAKE_CURRENT_SOURCE_DIR}/tests/TestTokenization2.expected || (echo 'Test failed, see diff above' && exit 1)"
+)
+
+add_test(NAME TestParsing
+        COMMAND bash -c "${CMAKE_BINARY_DIR}/locpp ${CMAKE_CURRENT_SOURCE_DIR}/tests/TestParsing.lox> actual_output.txt && diff -u actual_output.txt ${CMAKE_CURRENT_SOURCE_DIR}/tests/TestParsing.expected || (echo 'Test failed, see diff above' && exit 1)"
 )
