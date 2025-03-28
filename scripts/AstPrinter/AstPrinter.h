@@ -25,7 +25,6 @@ namespace lox
         TokenLiteral visitUnaryExpr(const Unary& expr) override;
 
     private:
-        std::string result{};
 
         template <typename... E>
         std::string parenthesize(const std::string& name, E... expr)

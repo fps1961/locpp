@@ -10,8 +10,7 @@ namespace lox
 {
     std::string AstPrinter::print(const std::shared_ptr<Expr>& expr)
     {
-        expr->accept(*this);
-        return result;
+        return std::visit(TokenLiteralEvaluator{}, expr->accept(*this));
     }
 
     TokenLiteral AstPrinter::visitBinaryExpr(const Binary& expr)
@@ -26,8 +25,7 @@ namespace lox
 
     TokenLiteral AstPrinter::visitLiteralExpr(const Literal& expr)
     {
-        //create a temp visitor struct so we can overload the () operator which is then called when we do std::visit
-        return std::visit(TokenLiteralEvaluator{}, expr.getValue());
+        return expr.getValue();
     }
 
     TokenLiteral AstPrinter::visitUnaryExpr(const Unary& expr)
