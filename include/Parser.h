@@ -1,9 +1,9 @@
 //
-// Created by shesh on 3/18/2025.
+// Created by sheshan on 3/18/2025.
 //
 
 #pragma once
-#include <assert.h>
+#include <cassert>
 #include <vector>
 
 #include "Expr.h"
@@ -20,10 +20,10 @@ namespace lox {
         class ParseError final : public std::runtime_error {
         public:
             ParseError() : std::runtime_error("Parse Error") {
-            };
+            }
 
             explicit ParseError(const std::string &message) : std::runtime_error(message) {
-            };
+            }
         };
 
         const std::vector<Token> &tokens{};
@@ -54,17 +54,17 @@ namespace lox {
             return false;
         }
 
-        Token consume(TokenType tokenType, std::string message);
+        Token consume(TokenType tokenType, const std::string& message);
 
-        bool check(TokenType tokenType) const;
+        [[nodiscard]] bool check(TokenType tokenType) const;
 
         Token advance();
 
-        bool isAtEnd() const;
+        [[nodiscard]] bool isAtEnd() const;
 
-        Token peek() const;
+        [[nodiscard]] Token peek() const;
 
-        Token previous() const;
+        [[nodiscard]] Token previous() const;
 
         ParseError error(const Token &token, const std::string &message);
 

@@ -1,11 +1,11 @@
 #include <fstream>
 #include <iostream>
 #include <sstream>
-#include <string.h>
+#include <cstring>
 #include <vector>
 #include <algorithm>
 //
-// Created by shesh on 3/11/2025.
+// Created by sheshan on 3/11/2025.
 //
 
 struct Field {

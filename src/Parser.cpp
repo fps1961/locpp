@@ -1,5 +1,5 @@
 //
-// Created by shesh on 3/18/2025.
+// Created by sheshan on 3/18/2025.
 //
 
 
@@ -113,7 +113,7 @@ namespace lox
     }
 
 
-    Token Parser::consume(TokenType tokenType, std::string message)
+    Token Parser::consume(TokenType tokenType, const std::string& message)
     {
         if (check(tokenType)) return advance();
 

@@ -13,13 +13,13 @@ namespace lox {
     public:
         virtual ~Visitor() = default;
 
-        virtual void visitBinaryExpr(const Binary &expr) = 0;
+        virtual TokenLiteral visitBinaryExpr(const Binary &expr) = 0;
 
-        virtual void visitGroupingExpr(const Grouping &expr) = 0;
+        virtual TokenLiteral visitGroupingExpr(const Grouping &expr) = 0;
 
-        virtual void visitLiteralExpr(const Literal &expr) = 0;
+        virtual TokenLiteral visitLiteralExpr(const Literal &expr) = 0;
 
-        virtual void visitUnaryExpr(const Unary &expr) = 0;
+        virtual TokenLiteral visitUnaryExpr(const Unary &expr) = 0;
     };
 
     class Expr {

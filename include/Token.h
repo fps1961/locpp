@@ -1,5 +1,5 @@
 //
-// Created by shesh on 3/7/2025.
+// Created by sheshan on 3/7/2025.
 //
 
 #pragma once
@@ -9,10 +9,20 @@
 #include "Token.h"
 #include "TokenType.h"
 
-namespace lox {
+namespace lox
+{
     using TokenLiteral = std::variant<std::monostate, std::string, double, bool>;
 
-    class Token {
+    struct TokenLiteralEvaluator
+    {
+        std::string operator()(std::monostate) const { return "nil"; }
+        std::string operator()(const std::string& s) const { return s; }
+        std::string operator()(const double d) const { return std::to_string(d); }
+        std::string operator()(const bool b) const { return b ? "true" : "false"; }
+    };
+
+    class Token
+    {
         TokenType type;
         std::string lexeme;
         TokenLiteral literal;
@@ -21,16 +31,16 @@ namespace lox {
     public:
         Token(TokenType type, std::string lexeme, TokenLiteral literal, int line);
 
-        [[nodiscard]] const std::string &getLexeme() const;
+        [[nodiscard]] const std::string& getLexeme() const;
 
-        [[nodiscard]] const TokenType &getTokenType() const;
+        [[nodiscard]] const TokenType& getTokenType() const;
 
-        [[nodiscard]] const TokenLiteral &getLiteral() const;
+        [[nodiscard]] const TokenLiteral& getLiteral() const;
 
         [[nodiscard]] int getLine() const;
 
         [[nodiscard]] std::string toString() const;
 
-        friend std::ostream &operator<<(std::ostream &os, const Token &token);
+        friend std::ostream& operator<<(std::ostream& os, const Token& token);
     };
 }
