@@ -14,30 +14,22 @@
 #include "../scripts/AstPrinter/AstPrinter.h"
 
 
-namespace lox
-{
-    void Lox::main(const int argc, char* argv[])
-    {
-        if (argc > 2)
-        {
+namespace lox {
+    void Lox::main(const int argc, char *argv[]) {
+        if (argc > 2) {
             std::cout << "Usage: locpp [script]";
             exit(64);
         }
-        if (argc == 2)
-        {
+        if (argc == 2) {
             readFile(argv[1]);
-        }
-        else
-        {
+        } else {
             runPrompt();
         }
     }
 
-    void Lox::readFile(const std::string& filename)
-    {
+    void Lox::readFile(const std::string &filename) {
         std::ifstream file(filename, std::ios::binary);
-        if (!file)
-        {
+        if (!file) {
             throw std::runtime_error("Error reading file: " + filename);
         }
 
@@ -46,14 +38,13 @@ namespace lox
         run(buffer.str());
 
         if (hadError) exit(65);
+        if (hadRuntimeError) exit(70);
     }
 
-    void Lox::runPrompt()
-    {
+    void Lox::runPrompt() {
         std::string line;
 
-        while (true)
-        {
+        while (true) {
             std::cout << "> ";
             if (!std::getline(std::cin, line)) break;
             run(line);
@@ -61,42 +52,42 @@ namespace lox
         }
     }
 
-    void Lox::run(const std::string& input)
-    {
+    void Lox::run(const std::string &input) {
         Scanner scanner{input};
         const std::vector<Token> tokens = scanner.scanTokens();
         Parser parser{tokens};
         const std::shared_ptr<Expr> expression = parser.parse();
 
         if (hadError) return;
+        interpreter.interpret(expression);
 
         std::cout << AstPrinter{}.print(expression) << "\n";
     }
 
-    void Lox::error(const int line, const std::string& message)
-    {
+    void Lox::error(const int line, const std::string &message) {
         report(line, "", message);
     }
 
+    void Lox::runtimeError(RuntimeError error) {
+        std::cout << error.what() << "\n[line " << error.token.getLine() << "]\n";
+        hadRuntimeError = true;
+    }
 
-    void Lox::report(const int line, const std::string& where, const std::string& message)
-    {
+
+    void Lox::report(const int line, const std::string &where, const std::string &message) {
         std::cerr << "[line " << line << "] Error" << where << ": " << message << std::endl;
         hadError = true;
     }
 
-    void Lox::error(const Token& token, const std::string& message)
-    {
-        if (token.getTokenType() == EOF)
-        {
+    void Lox::error(const Token &token, const std::string &message) {
+        if (token.getTokenType() == EOF) {
             report(token.getLine(), " at end", message);
-        }
-        else
-        {
+        } else {
             report(token.getLine(), " at '" + token.getLexeme() + "'", message);
         }
     }
 
 
     bool Lox::hadError = false;
+    bool Lox::hadRuntimeError = false;
 }

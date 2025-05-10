@@ -1,8 +1,21 @@
 #include "../include/Interpreter.h"
+#include <iostream>
+
+#include "../include/Lox.h"
+#include "../include/RuntimeError.h"
 //
 // Created by sheshan on 3/27/2025.
 //
 namespace lox {
+    void Interpreter::interpret(std::shared_ptr<Expr> expression) {
+        try {
+            auto value = evaluate(expression);
+            std::cout << stringify(value) << "\n";
+        } catch (RuntimeError error) {
+            Lox::runtimeError(error);
+        }
+    }
+
     TokenLiteral Interpreter::visitGroupingExpr(const Grouping &expr) {
         return evaluate(expr.getExpression());
     }
@@ -18,6 +31,7 @@ namespace lox {
             case BANG:
                 return !isTruthy(right);
             case MINUS:
+                checkNumberOperand(expr.getOp(), right);
                 return -std::get<double>(right);
             default:
                 break;
@@ -36,14 +50,19 @@ namespace lox {
             case EQUAL:
                 return isEqual(left, right);
             case GREATER:
+                checkNumberOperands(expr.getOp(), left, right);
                 return std::get<double>(left) > std::get<double>(right);
             case GREATER_EQUAL:
+                checkNumberOperands(expr.getOp(), left, right);
                 return std::get<double>(left) >= std::get<double>(right);
             case LESS:
+                checkNumberOperands(expr.getOp(), left, right);
                 return std::get<double>(left) < std::get<double>(right);
             case LESS_EQUAL:
+                checkNumberOperands(expr.getOp(), left, right);
                 return std::get<double>(left) <= std::get<double>(right);
             case MINUS:
+                checkNumberOperands(expr.getOp(), left, right);
                 return std::get<double>(left) - std::get<double>(right);
             case PLUS:
                 if (std::holds_alternative<double>(left) && std::holds_alternative<double>(right)) {
@@ -52,10 +71,12 @@ namespace lox {
                 if (std::holds_alternative<std::string>(left) && std::holds_alternative<std::string>(right)) {
                     return std::get<std::string>(left) + std::get<std::string>(right);
                 }
-                break;
+                throw RuntimeError{expr.getOp(), "Operands must be two numbers or two string."};
             case SLASH:
+                checkNumberOperands(expr.getOp(), left, right);
                 return std::get<double>(left) / std::get<double>(right);
             case STAR:
+                checkNumberOperands(expr.getOp(), left, right);
                 return std::get<double>(left) * std::get<double>(right);
             default:
                 break;
@@ -86,8 +107,21 @@ namespace lox {
         return false;
     }
 
+    void Interpreter::checkNumberOperand(const Token &token, const TokenLiteral &operand) {
+        if (std::holds_alternative<double>(operand)) return;
+        throw RuntimeError{token, "Operand must be a number."};
+    }
+
+    void Interpreter::checkNumberOperands(const Token &token, const TokenLiteral &left, const TokenLiteral &right) {
+        if (std::holds_alternative<double>(left) && std::holds_alternative<double>(right)) return;
+        throw RuntimeError{token, "Operands must be numbers."};
+    }
 
     TokenLiteral Interpreter::evaluate(const std::shared_ptr<Expr> &expr) {
         return expr->accept(*this);
+    }
+
+    std::string stringify(TokenLiteral &object) {
+        return std::visit(TokenLiteralToString{}, object);
     }
 }

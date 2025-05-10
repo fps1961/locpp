@@ -8,6 +8,8 @@
 namespace lox {
     class Interpreter : public Visitor {
     public:
+        void interpret(std::shared_ptr<Expr> expression);
+
         TokenLiteral visitGroupingExpr(const Grouping &expr) override;
 
         TokenLiteral visitLiteralExpr(const Literal &expr) override;
@@ -21,6 +23,12 @@ namespace lox {
 
         [[nodiscard]] bool isEqual(const TokenLiteral &a, const TokenLiteral &b) const;
 
+        void checkNumberOperand(const Token &token, const TokenLiteral &operand);
+
+        void checkNumberOperands(const Token &token, const TokenLiteral &left, const TokenLiteral &right);
+
         TokenLiteral evaluate(const std::shared_ptr<Expr> &expr);
+
+        std::string stringify(TokenLiteral &object);
     };
 }

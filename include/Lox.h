@@ -5,6 +5,8 @@
 #pragma once
 #include <string>
 
+#include "Interpreter.h"
+#include "RuntimeError.h"
 #include "Token.h"
 
 namespace lox {
@@ -16,8 +18,12 @@ namespace lox {
 
         static void error(const Token &token, const std::string &message);
 
+        static void runtimeError(RuntimeError error);
+
     private:
         static bool hadError;
+        static bool hadRuntimeError;
+        static Interpreter interpreter;
 
         static void readFile(const std::string &filename);
 
