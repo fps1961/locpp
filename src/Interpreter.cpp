@@ -7,11 +7,11 @@
 // Created by sheshan on 3/27/2025.
 //
 namespace lox {
-    void Interpreter::interpret(std::shared_ptr<Expr> expression) {
+    void Interpreter::interpret(const std::shared_ptr<Expr> &expression) {
         try {
             auto value = evaluate(expression);
             std::cout << stringify(value) << "\n";
-        } catch (RuntimeError error) {
+        } catch (RuntimeError &error) {
             Lox::runtimeError(error);
         }
     }
@@ -121,7 +121,7 @@ namespace lox {
         return expr->accept(*this);
     }
 
-    std::string stringify(TokenLiteral &object) {
+    std::string Interpreter::stringify(TokenLiteral &object) {
         return std::visit(TokenLiteralToString{}, object);
     }
 }

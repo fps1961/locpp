@@ -8,7 +8,7 @@
 namespace lox {
     class Interpreter : public Visitor {
     public:
-        void interpret(std::shared_ptr<Expr> expression);
+        void interpret(const std::shared_ptr<Expr>& expression);
 
         TokenLiteral visitGroupingExpr(const Grouping &expr) override;
 

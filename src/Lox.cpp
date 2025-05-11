@@ -60,8 +60,6 @@ namespace lox {
 
         if (hadError) return;
         interpreter.interpret(expression);
-
-        std::cout << AstPrinter{}.print(expression) << "\n";
     }
 
     void Lox::error(const int line, const std::string &message) {
@@ -90,4 +88,5 @@ namespace lox {
 
     bool Lox::hadError = false;
     bool Lox::hadRuntimeError = false;
+    Interpreter Lox::interpreter{};
 }

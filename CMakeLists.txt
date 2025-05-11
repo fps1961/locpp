@@ -30,14 +30,10 @@ endif ()
 
 enable_testing()
 
-add_test(NAME TestTokenization1
-        COMMAND bash -c "${CMAKE_BINARY_DIR}/locpp ${CMAKE_CURRENT_SOURCE_DIR}/tests/TestTokenization1.lox > actual_output.txt && diff -u actual_output.txt ${CMAKE_CURRENT_SOURCE_DIR}/tests/TestTokenization1.expected || (echo 'Test failed, see diff above' && exit 1)"
+add_test(NAME TestExpressions1
+        COMMAND bash -c "${CMAKE_BINARY_DIR}/locpp ${CMAKE_CURRENT_SOURCE_DIR}/tests/TestExpressions1.lox> actual_output.txt && diff -u actual_output.txt ${CMAKE_CURRENT_SOURCE_DIR}/tests/TestExpressions1.expected || (echo 'Test failed, see diff above' && exit 1)"
 )
 
-add_test(NAME TestTokenization2
-        COMMAND bash -c "${CMAKE_BINARY_DIR}/locpp ${CMAKE_CURRENT_SOURCE_DIR}/tests/TestTokenization2.lox> actual_output.txt && diff -u actual_output.txt ${CMAKE_CURRENT_SOURCE_DIR}/tests/TestTokenization2.expected || (echo 'Test failed, see diff above' && exit 1)"
-)
-
-add_test(NAME TestParsing
-        COMMAND bash -c "${CMAKE_BINARY_DIR}/locpp ${CMAKE_CURRENT_SOURCE_DIR}/tests/TestParsing.lox> actual_output.txt && diff -u actual_output.txt ${CMAKE_CURRENT_SOURCE_DIR}/tests/TestParsing.expected || (echo 'Test failed, see diff above' && exit 1)"
+add_test(NAME TestExpressions2
+        COMMAND bash -c "${CMAKE_BINARY_DIR}/locpp ${CMAKE_CURRENT_SOURCE_DIR}/tests/TestExpressions2.lox> actual_output.txt && diff -u actual_output.txt ${CMAKE_CURRENT_SOURCE_DIR}/tests/TestExpressions2.expected || (echo 'Test failed, see diff above' && exit 1)"
 )
