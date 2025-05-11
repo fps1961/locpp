@@ -1,6 +1,8 @@
 #pragma once
 #include <memory>
 #include <variant>
+
+#include "Expr.h"
 #include "../include/Token.h"
 
 namespace lox {
