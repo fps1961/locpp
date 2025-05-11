@@ -9,26 +9,22 @@
 #include <string>
 #include "../../include/Expr.h"
 
-namespace lox
-{
-    class AstPrinter final : public Visitor
-    {
+namespace lox {
+    class AstPrinter final : public ExprVisitor {
     public:
-        std::string print(const std::shared_ptr<Expr>& expr);
+        std::string print(const std::shared_ptr<Expr> &expr);
 
-        TokenLiteral visitBinaryExpr(const Binary& expr) override;
+        TokenLiteral visitBinaryExpr(const Binary &expr) override;
 
-        TokenLiteral visitGroupingExpr(const Grouping& expr) override;
+        TokenLiteral visitGroupingExpr(const Grouping &expr) override;
 
-        TokenLiteral visitLiteralExpr(const Literal& expr) override;
+        TokenLiteral visitLiteralExpr(const Literal &expr) override;
 
-        TokenLiteral visitUnaryExpr(const Unary& expr) override;
+        TokenLiteral visitUnaryExpr(const Unary &expr) override;
 
     private:
-
-        template <typename... E>
-        std::string parenthesize(const std::string& name, E... expr)
-        {
+        template<typename... E>
+        std::string parenthesize(const std::string &name, E... expr) {
             std::ostringstream res{};
             res << "( " << name;
             ((res << " " << print(expr)), ...);

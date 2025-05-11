@@ -100,8 +100,8 @@ void defineType(std::ofstream &writer, const std::string &baseName, const std::s
     }
 
     // Accept method
-    writer << "    void accept(Visitor& visitor) const override {\n";
-    writer << "        visitor.visit" << className << baseName << "(*this);\n";
+    writer << "    TokenLiteral accept(" << baseName << "Visitor& visitor) const override {\n";
+    writer << "        return visitor.visit" << className << baseName << "(*this);\n";
     writer << "    }\n\n";
 
     for (const auto &[type, name]: fields) {
@@ -127,19 +127,19 @@ std::string getLowerCased(const std::string &str) {
 
 void defineVisitor(std::ofstream &writer, const std::string &baseName, const std::vector<std::string> &types) {
     const auto lowerCasedBaseName = getLowerCased(baseName);
-    writer << "class " << "Visitor {\n" << "public:\n";
-    writer << "virtual ~" << "Visitor() = default;\n";
+    writer << "class " << baseName << "Visitor {\n" << "public:\n";
+    writer << "virtual ~" << baseName << "Visitor() = default;\n";
 
     for (const auto &type: types) {
         auto name = extractClassName(type);
-        writer << "virtual void visit" << name << baseName << "(const " << name << "& " << lowerCasedBaseName <<
+        writer << "virtual TokenLiteral visit" << name << baseName << "(const " << name << "& " << lowerCasedBaseName <<
                 ") = 0;\n";
     }
     writer << "};\n";
 
     writer << "class " << baseName << " {\n" << "public:\n";
     writer << "virtual ~" << baseName << "() = default;\n";
-    writer << "virtual void accept(Visitor& visitor) const = 0;\n";
+    writer << "virtual TokenLiteral accept(" << baseName << "Visitor& visitor) const = 0;\n";
 
     writer << "};\n";
 }
@@ -175,7 +175,11 @@ int main(const int argc, char *argv[]) {
     defineAst(outputDir, "Expr", {
                   "Binary   : Expr left, Token op, Expr right",
                   "Grouping : Expr expression",
-                  "Literal  : std::variant<double, std::string, bool, std::nullptr_t> value",
+                  "Literal  : TokenLiteral value",
                   "Unary    : Token op, Expr right"
+              });
+    defineAst(outputDir, "Stmt", {
+                  "Expression   : Expr expression",
+                  "Print        : Expr expression"
               });
 }
