@@ -56,10 +56,10 @@ namespace lox {
         Scanner scanner{input};
         const std::vector<Token> tokens = scanner.scanTokens();
         Parser parser{tokens};
-        const std::shared_ptr<Expr> expression = parser.parse();
+        const std::vector<std::shared_ptr<Stmt> > statements = parser.parse();
 
         if (hadError) return;
-        interpreter.interpret(expression);
+        interpreter.interpret(statements);
     }
 
     void Lox::error(const int line, const std::string &message) {

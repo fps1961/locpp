@@ -3,12 +3,15 @@
 //
 #pragma once
 
+#include <vector>
+
 #include "Expr.h"
+#include "Stmt.h"
 
 namespace lox {
-    class Interpreter : public ExprVisitor {
+    class Interpreter : public ExprVisitor, public StmtVisitor {
     public:
-        void interpret(const std::shared_ptr<Expr> &expression);
+        void interpret(const std::vector<std::shared_ptr<Stmt> > &statements);
 
         TokenLiteral visitGroupingExpr(const Grouping &expr) override;
 
@@ -17,6 +20,10 @@ namespace lox {
         TokenLiteral visitUnaryExpr(const Unary &expr) override;
 
         TokenLiteral visitBinaryExpr(const Binary &expr) override;
+
+        TokenLiteral visitExpressionStmt(const Expression &stmp) override;
+
+        TokenLiteral visitPrintStmt(const Print &stmt) override;
 
     private:
         [[nodiscard]] bool isTruthy(TokenLiteral token_literal) const;
@@ -28,6 +35,8 @@ namespace lox {
         void checkNumberOperands(const Token &token, const TokenLiteral &left, const TokenLiteral &right);
 
         TokenLiteral evaluate(const std::shared_ptr<Expr> &expr);
+
+        void execute(const std::shared_ptr<Stmt>& stmt);
 
         std::string stringify(TokenLiteral &object);
     };

@@ -1,8 +1,6 @@
 #pragma once
 #include <memory>
 #include <variant>
-
-#include "Expr.h"
 #include "../include/Token.h"
 
 namespace lox {
@@ -26,10 +24,10 @@ namespace lox {
     };
 
     class Expression final : public Stmt {
-        Expr expression;
+        std::shared_ptr<Expr> expression;
 
     public:
-        explicit Expression(Expr expression)
+        explicit Expression(std::shared_ptr<Expr> expression)
             : expression(std::move(expression)) {
         }
 
@@ -37,14 +35,14 @@ namespace lox {
             return visitor.visitExpressionStmt(*this);
         }
 
-        [[nodiscard]] const Expr &getExpression() const { return expression; }
+        [[nodiscard]] const std::shared_ptr<Expr> &getExpression() const { return expression; }
     };
 
     class Print final : public Stmt {
-        Expr expression;
+        std::shared_ptr<Expr> expression;
 
     public:
-        explicit Print(Expr expression)
+        explicit Print(std::shared_ptr<Expr> expression)
             : expression(std::move(expression)) {
         }
 
@@ -52,6 +50,6 @@ namespace lox {
             return visitor.visitPrintStmt(*this);
         }
 
-        [[nodiscard]] const Expr &getExpression() const { return expression; }
+        [[nodiscard]] const std::shared_ptr<Expr> &getExpression() const { return expression; }
     };
 }

@@ -7,6 +7,7 @@
 #include <vector>
 
 #include "Expr.h"
+#include "Stmt.h"
 #include "Token.h"
 
 namespace lox {
@@ -14,7 +15,7 @@ namespace lox {
     public:
         explicit Parser(const std::vector<Token> &tokens);
 
-        std::shared_ptr<Expr> parse();
+        std::vector<std::shared_ptr<Stmt> > parse();
 
     private:
         class ParseError final : public std::runtime_error {
@@ -30,6 +31,12 @@ namespace lox {
         int current{0};
 
         std::shared_ptr<Expr> expression();
+
+        std::shared_ptr<Stmt> statement();
+
+        std::shared_ptr<Stmt> printStatement();
+
+        std::shared_ptr<Stmt> expressionStatement();
 
         std::shared_ptr<Expr> equality();
 
@@ -54,7 +61,7 @@ namespace lox {
             return false;
         }
 
-        Token consume(TokenType tokenType, const std::string& message);
+        Token consume(TokenType tokenType, const std::string &message);
 
         [[nodiscard]] bool check(TokenType tokenType) const;
 

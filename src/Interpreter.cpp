@@ -7,10 +7,11 @@
 // Created by sheshan on 3/27/2025.
 //
 namespace lox {
-    void Interpreter::interpret(const std::shared_ptr<Expr> &expression) {
+    void Interpreter::interpret(const std::vector<std::shared_ptr<Stmt> > &statements) {
         try {
-            auto value = evaluate(expression);
-            std::cout << stringify(value) << "\n";
+            for (auto statement: statements) {
+                execute(statement);
+            }
         } catch (RuntimeError &error) {
             Lox::runtimeError(error);
         }
@@ -66,7 +67,7 @@ namespace lox {
                 return std::get<double>(left) - std::get<double>(right);
             case PLUS:
                 if (std::holds_alternative<double>(left) && std::holds_alternative<double>(right)) {
-                    return std::get<double>(left) - std::get<double>(right);
+                    return std::get<double>(left) + std::get<double>(right);
                 }
                 if (std::holds_alternative<std::string>(left) && std::holds_alternative<std::string>(right)) {
                     return std::get<std::string>(left) + std::get<std::string>(right);
@@ -83,6 +84,17 @@ namespace lox {
         }
 
         return nullptr;
+    }
+
+    TokenLiteral Interpreter::visitPrintStmt(const Print &stmt) {
+        TokenLiteral value = evaluate(stmt.getExpression());
+        std::cout << stringify(value) << "\n";
+        return {};
+    }
+
+    TokenLiteral Interpreter::visitExpressionStmt(const Expression &stmp) {
+        evaluate(stmp.getExpression());
+        return {};
     }
 
 
@@ -120,6 +132,11 @@ namespace lox {
     TokenLiteral Interpreter::evaluate(const std::shared_ptr<Expr> &expr) {
         return expr->accept(*this);
     }
+
+    void Interpreter::execute(const std::shared_ptr<Stmt> &stmt) {
+        stmt->accept(*this);
+    }
+
 
     std::string Interpreter::stringify(TokenLiteral &object) {
         return std::visit(TokenLiteralToString{}, object);

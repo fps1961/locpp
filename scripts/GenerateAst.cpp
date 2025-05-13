@@ -4,9 +4,12 @@
 #include <cstring>
 #include <vector>
 #include <algorithm>
+#include <unordered_set>
 //
 // Created by sheshan on 3/11/2025.
 //
+
+std::unordered_set<std::string> sharedFields{"Expr"};
 
 struct Field {
     std::string type;
@@ -66,8 +69,8 @@ void defineType(std::ofstream &writer, const std::string &baseName, const std::s
     // Fields with shared_ptr
     for (const auto &[type, name]: fields) {
         std::string fieldType = type;
-        if (fieldType == baseName) {
-            fieldType = "std::shared_ptr<" + baseName + ">";
+        if (sharedFields.contains(fieldType)) {
+            fieldType = "std::shared_ptr<" + fieldType + ">";
         }
         writer << "    " << fieldType << " " << name << ";\n";
     }
@@ -78,8 +81,8 @@ void defineType(std::ofstream &writer, const std::string &baseName, const std::s
     writer << "    " << (fields.size() == 1 ? "explicit " : "") << className << "(";
     for (size_t i = 0; i < fields.size(); ++i) {
         std::string fieldType = fields[i].type;
-        if (fieldType == baseName) {
-            fieldType = "std::shared_ptr<" + baseName + ">";
+        if (sharedFields.contains(fieldType)) {
+            fieldType = "std::shared_ptr<" + fieldType + ">";
         }
         writer << fieldType << " " << fields[i].name;
         if (i != fields.size() - 1) {
@@ -105,8 +108,8 @@ void defineType(std::ofstream &writer, const std::string &baseName, const std::s
     writer << "    }\n\n";
 
     for (const auto &[type, name]: fields) {
-        if (std::string fieldType = type; fieldType == baseName) {
-            writer << "[[nodiscard]] const std::shared_ptr<" << baseName << ">& get"
+        if (std::string fieldType = type; sharedFields.contains(fieldType)) {
+            writer << "[[nodiscard]] const std::shared_ptr<" << fieldType << ">& get"
                     << std::string(1, static_cast<char>(std::toupper(name[0]))) << name.substr(1)
                     << "() const { return " << name << "; }\n";
         } else {
@@ -172,12 +175,12 @@ int main(const int argc, char *argv[]) {
         exit(64);
     }
     const std::string outputDir{argv[1]};
-    defineAst(outputDir, "Expr", {
-                  "Binary   : Expr left, Token op, Expr right",
-                  "Grouping : Expr expression",
-                  "Literal  : TokenLiteral value",
-                  "Unary    : Token op, Expr right"
-              });
+    // defineAst(outputDir, "Expr", {
+    //               "Binary   : Expr left, Token op, Expr right",
+    //               "Grouping : Expr expression",
+    //               "Literal  : TokenLiteral value",
+    //               "Unary    : Token op, Expr right"
+    //           });
     defineAst(outputDir, "Stmt", {
                   "Expression   : Expr expression",
                   "Print        : Expr expression"
