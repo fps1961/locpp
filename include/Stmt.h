@@ -6,6 +6,7 @@
 namespace lox {
     class Expression;
     class Print;
+    class Var;
 
     class StmtVisitor {
     public:
@@ -14,6 +15,8 @@ namespace lox {
         virtual TokenLiteral visitExpressionStmt(const Expression &stmt) = 0;
 
         virtual TokenLiteral visitPrintStmt(const Print &stmt) = 0;
+
+        virtual TokenLiteral visitVarStmt(const Var &stmt) = 0;
     };
 
     class Stmt {
@@ -51,5 +54,22 @@ namespace lox {
         }
 
         [[nodiscard]] const std::shared_ptr<Expr> &getExpression() const { return expression; }
+    };
+
+    class Var final : public Stmt {
+        Token name;
+        std::shared_ptr<Expr> initializer;
+
+    public:
+        Var(Token name, std::shared_ptr<Expr> initializer)
+            : name(std::move(name)), initializer(std::move(initializer)) {
+        }
+
+        TokenLiteral accept(StmtVisitor &visitor) const override {
+            return visitor.visitVarStmt(*this);
+        }
+
+        [[nodiscard]] const Token &getName() const { return name; }
+        [[nodiscard]] const std::shared_ptr<Expr> &getInitializer() const { return initializer; }
     };
 }

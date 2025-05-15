@@ -175,14 +175,16 @@ int main(const int argc, char *argv[]) {
         exit(64);
     }
     const std::string outputDir{argv[1]};
-    // defineAst(outputDir, "Expr", {
-    //               "Binary   : Expr left, Token op, Expr right",
-    //               "Grouping : Expr expression",
-    //               "Literal  : TokenLiteral value",
-    //               "Unary    : Token op, Expr right"
-    //           });
+    defineAst(outputDir, "Expr", {
+                  "Binary   : Expr left, Token op, Expr right",
+                  "Grouping : Expr expression",
+                  "Literal  : TokenLiteral value",
+                  "Unary    : Token op, Expr right",
+                  "Variable : Token name"
+              });
     defineAst(outputDir, "Stmt", {
                   "Expression   : Expr expression",
-                  "Print        : Expr expression"
+                  "Print        : Expr expression",
+                  "Var          : Token name, Expr initializer"
               });
 }

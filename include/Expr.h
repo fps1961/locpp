@@ -8,6 +8,7 @@ namespace lox {
     class Grouping;
     class Literal;
     class Unary;
+    class Variable;
 
     class ExprVisitor {
     public:
@@ -20,6 +21,8 @@ namespace lox {
         virtual TokenLiteral visitLiteralExpr(const Literal &expr) = 0;
 
         virtual TokenLiteral visitUnaryExpr(const Unary &expr) = 0;
+
+        virtual TokenLiteral visitVariableExpr(const Variable &expr) = 0;
     };
 
     class Expr {
@@ -93,5 +96,20 @@ namespace lox {
 
         [[nodiscard]] const Token &getOp() const { return op; }
         [[nodiscard]] const std::shared_ptr<Expr> &getRight() const { return right; }
+    };
+
+    class Variable final : public Expr {
+        Token name;
+
+    public:
+        explicit Variable(Token name)
+            : name(std::move(name)) {
+        }
+
+        TokenLiteral accept(ExprVisitor &visitor) const override {
+            return visitor.visitVariableExpr(*this);
+        }
+
+        [[nodiscard]] const Token &getName() const { return name; }
     };
 }

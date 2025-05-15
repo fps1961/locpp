@@ -14,7 +14,7 @@ namespace lox {
     std::vector<std::shared_ptr<Stmt> > Parser::parse() {
         std::vector<std::shared_ptr<Stmt> > statements{};
         while (!isAtEnd()) {
-            statements.push_back(statement());
+            statements.push_back(declaration());
         }
         return statements;
     }
@@ -22,6 +22,17 @@ namespace lox {
     std::shared_ptr<Expr> Parser::expression() {
         return equality();
     }
+
+    std::shared_ptr<Stmt> Parser::declaration() {
+        try {
+            if (match(VAR)) return varDeclaration();
+            return statement();
+        } catch (ParseError error) {
+            synchronize();
+            return nullptr;
+        }
+    }
+
 
     std::shared_ptr<Stmt> Parser::statement() {
         if (match(PRINT)) return printStatement();
@@ -34,6 +45,17 @@ namespace lox {
         consume(SEMICOLON, "Expect ';' after expression.");
         return std::make_shared<Print>(expr);
     }
+
+    std::shared_ptr<Stmt> Parser::varDeclaration() {
+        Token name = consume(IDENTIFIER, "Expect variable name.");
+
+        std::shared_ptr<Expr> initializer = nullptr;
+        if (match(EQUAL)) initializer = expression();
+
+        consume(SEMICOLON, "Expect ';' after variable declaration.");
+        return std::make_shared<Var>(name, initializer);
+    }
+
 
     std::shared_ptr<Stmt> Parser::expressionStatement() {
         auto expr = expression();
@@ -101,6 +123,8 @@ namespace lox {
         if (match(NIL)) return std::make_shared<Literal>(nullptr);
 
         if (match(NUMBER, STRING)) return std::make_shared<Literal>(previous().getLiteral());
+
+        if (match(IDENTIFIER)) return std::make_shared<Variable>(previous());
 
         if (match(LEFT_PAREN)) {
             std::shared_ptr<Expr> expr = expression();
