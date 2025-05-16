@@ -41,6 +41,10 @@ namespace lox {
         return {};
     }
 
+    TokenLiteral Interpreter::visitVariableExpr(const Variable &expr) {
+        return environment->get(expr.getName());
+    }
+
     TokenLiteral Interpreter::visitBinaryExpr(const Binary &expr) {
         const TokenLiteral left = evaluate(expr.getLeft());
         const TokenLiteral right = evaluate(expr.getRight());
@@ -91,6 +95,17 @@ namespace lox {
         std::cout << stringify(value) << "\n";
         return {};
     }
+
+
+    TokenLiteral Interpreter::visitVarStmt(const Var &stmt) {
+        TokenLiteral value = nullptr;
+        if (stmt.getInitializer() != nullptr) {
+            value = evaluate(stmt.getInitializer());
+        }
+        environment->define(stmt.getName().getLexeme(), value);
+        return {};
+    }
+
 
     TokenLiteral Interpreter::visitExpressionStmt(const Expression &stmp) {
         evaluate(stmp.getExpression());

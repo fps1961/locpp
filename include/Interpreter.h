@@ -5,6 +5,7 @@
 
 #include <vector>
 
+#include "Environment.h"
 #include "Expr.h"
 #include "Stmt.h"
 
@@ -18,14 +19,22 @@ namespace lox {
         TokenLiteral visitLiteralExpr(const Literal &expr) override;
 
         TokenLiteral visitUnaryExpr(const Unary &expr) override;
+        TokenLiteral visitVariableExpr(const Variable &expr) override;
+
 
         TokenLiteral visitBinaryExpr(const Binary &expr) override;
 
         TokenLiteral visitExpressionStmt(const Expression &stmp) override;
 
         TokenLiteral visitPrintStmt(const Print &stmt) override;
+        TokenLiteral visitVarStmt(const Var &stmt) override;
+
+
+
 
     private:
+        std::shared_ptr<Environment> environment{new Environment};
+
         [[nodiscard]] bool isTruthy(TokenLiteral token_literal) const;
 
         [[nodiscard]] bool isEqual(const TokenLiteral &a, const TokenLiteral &b) const;
@@ -36,7 +45,7 @@ namespace lox {
 
         TokenLiteral evaluate(const std::shared_ptr<Expr> &expr);
 
-        void execute(const std::shared_ptr<Stmt>& stmt);
+        void execute(const std::shared_ptr<Stmt> &stmt);
 
         std::string stringify(TokenLiteral &object);
     };
