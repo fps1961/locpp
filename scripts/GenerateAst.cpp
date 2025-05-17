@@ -176,6 +176,7 @@ int main(const int argc, char *argv[]) {
     }
     const std::string outputDir{argv[1]};
     defineAst(outputDir, "Expr", {
+                  "Assign : Token name, Expr value",
                   "Binary   : Expr left, Token op, Expr right",
                   "Grouping : Expr expression",
                   "Literal  : TokenLiteral value",

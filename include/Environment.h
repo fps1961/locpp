@@ -15,5 +15,6 @@ namespace lox {
         void define(const std::string &name, const TokenLiteral &value);
 
         TokenLiteral get(Token name);
+        void assign(Token name, TokenLiteral & value);
     };
 }

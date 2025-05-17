@@ -19,4 +19,12 @@ namespace lox {
 
         throw RuntimeError(name, "Undefine variable '" + name.getLexeme() + "'.");
     }
+
+    void Environment::assign(Token name, TokenLiteral &value) {
+        if (values.contains(name.getLexeme())) {
+            values[name.getLexeme()] = value;
+            return;
+        }
+        throw RuntimeError(name, "Undefine variable '" + name.getLexeme() + "'.");
+    }
 }

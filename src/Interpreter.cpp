@@ -106,6 +106,12 @@ namespace lox {
         return {};
     }
 
+    TokenLiteral Interpreter::visitAssignExpr(const Assign &expr) {
+        TokenLiteral value = evaluate(expr.getValue());
+        environment->assign(expr.getName(), value);
+        return value;
+    }
+
 
     TokenLiteral Interpreter::visitExpressionStmt(const Expression &stmp) {
         evaluate(stmp.getExpression());

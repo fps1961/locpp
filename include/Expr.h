@@ -4,6 +4,7 @@
 #include "../include/Token.h"
 
 namespace lox {
+    class Assign;
     class Binary;
     class Grouping;
     class Literal;
@@ -13,6 +14,8 @@ namespace lox {
     class ExprVisitor {
     public:
         virtual ~ExprVisitor() = default;
+
+        virtual TokenLiteral visitAssignExpr(const Assign &expr) = 0;
 
         virtual TokenLiteral visitBinaryExpr(const Binary &expr) = 0;
 
@@ -30,6 +33,23 @@ namespace lox {
         virtual ~Expr() = default;
 
         virtual TokenLiteral accept(ExprVisitor &visitor) const = 0;
+    };
+
+    class Assign final : public Expr {
+        Token name;
+        std::shared_ptr<Expr> value;
+
+    public:
+        Assign(Token name, std::shared_ptr<Expr> value)
+            : name(std::move(name)), value(std::move(value)) {
+        }
+
+        TokenLiteral accept(ExprVisitor &visitor) const override {
+            return visitor.visitAssignExpr(*this);
+        }
+
+        [[nodiscard]] const Token &getName() const { return name; }
+        [[nodiscard]] const std::shared_ptr<Expr> &getValue() const { return value; }
     };
 
     class Binary final : public Expr {

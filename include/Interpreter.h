@@ -19,6 +19,7 @@ namespace lox {
         TokenLiteral visitLiteralExpr(const Literal &expr) override;
 
         TokenLiteral visitUnaryExpr(const Unary &expr) override;
+
         TokenLiteral visitVariableExpr(const Variable &expr) override;
 
 
@@ -27,10 +28,10 @@ namespace lox {
         TokenLiteral visitExpressionStmt(const Expression &stmp) override;
 
         TokenLiteral visitPrintStmt(const Print &stmt) override;
+
         TokenLiteral visitVarStmt(const Var &stmt) override;
 
-
-
+        TokenLiteral visitAssignExpr(const Assign &expr) override;
 
     private:
         std::shared_ptr<Environment> environment{new Environment};

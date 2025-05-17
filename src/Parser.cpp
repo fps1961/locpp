@@ -20,14 +20,14 @@ namespace lox {
     }
 
     std::shared_ptr<Expr> Parser::expression() {
-        return equality();
+        return assignment();
     }
 
     std::shared_ptr<Stmt> Parser::declaration() {
         try {
             if (match(VAR)) return varDeclaration();
             return statement();
-        } catch (ParseError error) {
+        } catch (ParseError &error) {
             synchronize();
             return nullptr;
         }
@@ -61,6 +61,23 @@ namespace lox {
         auto expr = expression();
         consume(SEMICOLON, "Expect ';' after expression.");
         return std::make_shared<Expression>(expr);
+    }
+
+    std::shared_ptr<Expr> Parser::assignment() {
+        std::shared_ptr<Expr> expr = equality();
+
+        if (match(EQUAL)) {
+            const Token equals = previous();
+            std::shared_ptr<Expr> value = assignment();
+
+            if (const Variable *e = dynamic_cast<Variable *>(expr.get())) {
+                Token name = e->getName();
+                return std::make_shared<Assign>(name, value);
+            }
+            error(equals, "Invalid assignment target.");
+        }
+
+        return expr;
     }
 
 
