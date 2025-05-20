@@ -8,6 +8,13 @@
 #include "../include/RuntimeError.h"
 
 namespace lox {
+    Environment::Environment() : enclosing(nullptr) {
+    };
+
+    Environment::Environment(std::shared_ptr<Environment> enclosing) : enclosing(std::move(enclosing)) {
+    }
+
+
     void Environment::define(const std::string &name, const TokenLiteral &value) {
         values[name] = value;
     }
@@ -17,6 +24,8 @@ namespace lox {
             return values.at(name.getLexeme());
         }
 
+        if (enclosing != nullptr) return enclosing->get(name);
+
         throw RuntimeError(name, "Undefine variable '" + name.getLexeme() + "'.");
     }
 
@@ -25,6 +34,12 @@ namespace lox {
             values[name.getLexeme()] = value;
             return;
         }
+
+        if (enclosing != nullptr) {
+            enclosing->assign(name, value);
+            return;
+        }
+
         throw RuntimeError(name, "Undefine variable '" + name.getLexeme() + "'.");
     }
 }

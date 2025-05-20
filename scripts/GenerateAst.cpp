@@ -9,7 +9,7 @@
 // Created by sheshan on 3/11/2025.
 //
 
-std::unordered_set<std::string> sharedFields{"Expr"};
+std::unordered_set<std::string> sharedFields{"Expr", "Stmt"};
 
 struct Field {
     std::string type;
@@ -41,10 +41,13 @@ std::vector<Field> extractFields(const std::string &definition) {
             insideTemplate = true;
             type += token;
         } else if (insideTemplate) {
-            type += " " + token;
-            if (token.find('>') != std::string::npos) {
-                insideTemplate = false;
+            std::string name = token;
+            if (!name.empty() && name.back() == ',') {
+                name.pop_back();
             }
+            fields.push_back({type, name});
+            type.clear();
+            insideTemplate = false;
         } else {
             if (type.empty()) {
                 type = token;
@@ -184,6 +187,7 @@ int main(const int argc, char *argv[]) {
                   "Variable : Token name"
               });
     defineAst(outputDir, "Stmt", {
+                  "Block        : std::vector<std::shared_ptr<Stmt>> statements",
                   "Expression   : Expr expression",
                   "Print        : Expr expression",
                   "Var          : Token name, Expr initializer"

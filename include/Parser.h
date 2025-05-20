@@ -42,6 +42,8 @@ namespace lox {
 
         std::shared_ptr<Stmt> expressionStatement();
 
+        std::vector<std::shared_ptr<Stmt> > block();
+
         std::shared_ptr<Expr> assignment();
 
         std::shared_ptr<Expr> equality();

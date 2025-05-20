@@ -4,6 +4,7 @@
 #include "../include/Token.h"
 
 namespace lox {
+    class Block;
     class Expression;
     class Print;
     class Var;
@@ -11,6 +12,8 @@ namespace lox {
     class StmtVisitor {
     public:
         virtual ~StmtVisitor() = default;
+
+        virtual TokenLiteral visitBlockStmt(const Block &stmt) = 0;
 
         virtual TokenLiteral visitExpressionStmt(const Expression &stmt) = 0;
 
@@ -24,6 +27,21 @@ namespace lox {
         virtual ~Stmt() = default;
 
         virtual TokenLiteral accept(StmtVisitor &visitor) const = 0;
+    };
+
+    class Block final : public Stmt {
+        std::vector<std::shared_ptr<Stmt> > statements;
+
+    public:
+        explicit Block(std::vector<std::shared_ptr<Stmt> > statements)
+            : statements(std::move(statements)) {
+        }
+
+        TokenLiteral accept(StmtVisitor &visitor) const override {
+            return visitor.visitBlockStmt(*this);
+        }
+
+        [[nodiscard]] const std::vector<std::shared_ptr<Stmt> > &getStatements() const { return statements; }
     };
 
     class Expression final : public Stmt {

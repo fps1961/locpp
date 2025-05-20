@@ -118,6 +118,11 @@ namespace lox {
         return {};
     }
 
+    TokenLiteral Interpreter::visitBlockStmt(const Block &stmt) {
+        executeBlock(stmt.getStatements(), std::make_shared<Environment>(environment));
+        return {};
+    }
+
 
     bool Interpreter::isTruthy(TokenLiteral token_literal) const {
         return std::visit(TokenLiteralToBoolean{}, token_literal);
@@ -156,6 +161,22 @@ namespace lox {
 
     void Interpreter::execute(const std::shared_ptr<Stmt> &stmt) {
         stmt->accept(*this);
+    }
+
+    void Interpreter::executeBlock(const std::vector<std::shared_ptr<Stmt> > &statements,
+                                   const std::shared_ptr<Environment> &environment) {
+        auto previous = this->environment;
+        try {
+            this->environment = environment;
+            for (const auto &statement: statements) {
+                execute(statement);
+            }
+        } catch (...) {
+            this->environment = previous;
+            throw;
+        }
+
+        this->environment = previous;
     }
 
 

@@ -36,6 +36,7 @@ namespace lox {
 
     std::shared_ptr<Stmt> Parser::statement() {
         if (match(PRINT)) return printStatement();
+        if (match(LEFT_BRACE)) return std::make_shared<Block>(block());
 
         return expressionStatement();
     }
@@ -62,6 +63,16 @@ namespace lox {
         consume(SEMICOLON, "Expect ';' after expression.");
         return std::make_shared<Expression>(expr);
     }
+
+    std::vector<std::shared_ptr<Stmt> > Parser::block() {
+        std::vector<std::shared_ptr<Stmt> > statements{};
+        while (!check(RIGHT_BRACE) && !isAtEnd()) {
+            statements.push_back(declaration());
+        }
+        consume(RIGHT_BRACE, "Expect '}' after block.");
+        return statements;
+    }
+
 
     std::shared_ptr<Expr> Parser::assignment() {
         std::shared_ptr<Expr> expr = equality();

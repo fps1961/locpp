@@ -33,6 +33,8 @@ namespace lox {
 
         TokenLiteral visitAssignExpr(const Assign &expr) override;
 
+        TokenLiteral visitBlockStmt(const Block &stmt) override;
+
     private:
         std::shared_ptr<Environment> environment{new Environment};
 
@@ -47,6 +49,8 @@ namespace lox {
         TokenLiteral evaluate(const std::shared_ptr<Expr> &expr);
 
         void execute(const std::shared_ptr<Stmt> &stmt);
+
+        void executeBlock(const std::vector<std::shared_ptr<Stmt> > &statements, const std::shared_ptr<Environment> &environment);
 
         std::string stringify(TokenLiteral &object);
     };
