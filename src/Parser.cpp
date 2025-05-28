@@ -35,11 +35,24 @@ namespace lox {
 
 
     std::shared_ptr<Stmt> Parser::statement() {
+        if (match(IF)) return ifStatement();
         if (match(PRINT)) return printStatement();
         if (match(LEFT_BRACE)) return std::make_shared<Block>(block());
 
         return expressionStatement();
     }
+
+    std::shared_ptr<Stmt> Parser::ifStatement() {
+        consume(LEFT_PAREN, "Expect '(' after 'if'.");
+        std::shared_ptr<Expr> condition = expression();
+        consume(RIGHT_PAREN, "Expect ')' after if condition.");
+
+        std::shared_ptr<Stmt> thenBranch = statement();
+        std::shared_ptr<Stmt> elseBranch = nullptr;
+        if (match(ELSE)) { elseBranch = statement(); };
+        return std::make_shared<If>(condition, thenBranch, elseBranch);
+    }
+
 
     std::shared_ptr<Stmt> Parser::printStatement() {
         const std::shared_ptr<Expr> expr = expression();

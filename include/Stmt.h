@@ -6,6 +6,7 @@
 namespace lox {
     class Block;
     class Expression;
+    class If;
     class Print;
     class Var;
 
@@ -16,6 +17,8 @@ namespace lox {
         virtual TokenLiteral visitBlockStmt(const Block &stmt) = 0;
 
         virtual TokenLiteral visitExpressionStmt(const Expression &stmt) = 0;
+
+        virtual TokenLiteral visitIfStmt(const If &stmt) = 0;
 
         virtual TokenLiteral visitPrintStmt(const Print &stmt) = 0;
 
@@ -57,6 +60,25 @@ namespace lox {
         }
 
         [[nodiscard]] const std::shared_ptr<Expr> &getExpression() const { return expression; }
+    };
+
+    class If final : public Stmt {
+        std::shared_ptr<Expr> condition;
+        std::shared_ptr<Stmt> thenBranch;
+        std::shared_ptr<Stmt> elseBranch;
+
+    public:
+        If(std::shared_ptr<Expr> condition, std::shared_ptr<Stmt> thenBranch, std::shared_ptr<Stmt> elseBranch)
+            : condition(std::move(condition)), thenBranch(std::move(thenBranch)), elseBranch(std::move(elseBranch)) {
+        }
+
+        TokenLiteral accept(StmtVisitor &visitor) const override {
+            return visitor.visitIfStmt(*this);
+        }
+
+        [[nodiscard]] const std::shared_ptr<Expr> &getCondition() const { return condition; }
+        [[nodiscard]] const std::shared_ptr<Stmt> &getThenBranch() const { return thenBranch; }
+        [[nodiscard]] const std::shared_ptr<Stmt> &getElseBranch() const { return elseBranch; }
     };
 
     class Print final : public Stmt {

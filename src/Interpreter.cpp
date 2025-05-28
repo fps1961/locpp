@@ -98,7 +98,7 @@ namespace lox {
 
 
     TokenLiteral Interpreter::visitVarStmt(const Var &stmt) {
-        TokenLiteral value = nullptr;
+        TokenLiteral value = std::monostate{};
         if (stmt.getInitializer() != nullptr) {
             value = evaluate(stmt.getInitializer());
         }
@@ -117,6 +117,16 @@ namespace lox {
         evaluate(stmp.getExpression());
         return {};
     }
+
+    TokenLiteral Interpreter::visitIfStmt(const If &stmt) {
+        if (isTruthy(evaluate(stmt.getCondition()))) {
+            execute(stmt.getThenBranch());
+        } else if (stmt.getElseBranch() != nullptr) {
+            execute(stmt.getElseBranch());
+        }
+        return {};
+    }
+
 
     TokenLiteral Interpreter::visitBlockStmt(const Block &stmt) {
         executeBlock(stmt.getStatements(), std::make_shared<Environment>(environment));

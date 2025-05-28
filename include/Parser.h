@@ -36,6 +36,8 @@ namespace lox {
 
         std::shared_ptr<Stmt> statement();
 
+        std::shared_ptr<Stmt> ifStatement();
+
         std::shared_ptr<Stmt> printStatement();
 
         std::shared_ptr<Stmt> varDeclaration();

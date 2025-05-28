@@ -27,6 +27,8 @@ namespace lox {
 
         TokenLiteral visitExpressionStmt(const Expression &stmp) override;
 
+        TokenLiteral visitIfStmt(const If &stmt) override;
+
         TokenLiteral visitPrintStmt(const Print &stmt) override;
 
         TokenLiteral visitVarStmt(const Var &stmt) override;
@@ -50,7 +52,8 @@ namespace lox {
 
         void execute(const std::shared_ptr<Stmt> &stmt);
 
-        void executeBlock(const std::vector<std::shared_ptr<Stmt> > &statements, const std::shared_ptr<Environment> &environment);
+        void executeBlock(const std::vector<std::shared_ptr<Stmt> > &statements,
+                          const std::shared_ptr<Environment> &environment);
 
         std::string stringify(TokenLiteral &object);
     };
