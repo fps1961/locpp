@@ -18,10 +18,11 @@ namespace lox {
 
         TokenLiteral visitLiteralExpr(const Literal &expr) override;
 
+        TokenLiteral visitLogicalExpr(const Logical &expr) override;
+
         TokenLiteral visitUnaryExpr(const Unary &expr) override;
 
         TokenLiteral visitVariableExpr(const Variable &expr) override;
-
 
         TokenLiteral visitBinaryExpr(const Binary &expr) override;
 

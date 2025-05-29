@@ -48,6 +48,10 @@ namespace lox {
 
         std::shared_ptr<Expr> assignment();
 
+        std::shared_ptr<Expr> orExpression();
+
+        std::shared_ptr<Expr> andExpression();
+
         std::shared_ptr<Expr> equality();
 
         std::shared_ptr<Expr> comparison();

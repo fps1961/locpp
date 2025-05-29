@@ -25,6 +25,17 @@ namespace lox {
         return expr.getValue();
     }
 
+    TokenLiteral Interpreter::visitLogicalExpr(const Logical &expr) {
+        TokenLiteral left = evaluate(expr.getLeft());
+        if (expr.getOp().getTokenType() == OR) {
+            if (isTruthy(left)) return left;
+        } else {
+            if (!isTruthy(left)) return left;
+        }
+        return evaluate(expr.getRight());
+    }
+
+
     TokenLiteral Interpreter::visitUnaryExpr(const Unary &expr) {
         const TokenLiteral right = evaluate(expr.getRight());
 

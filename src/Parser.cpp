@@ -88,7 +88,7 @@ namespace lox {
 
 
     std::shared_ptr<Expr> Parser::assignment() {
-        std::shared_ptr<Expr> expr = equality();
+        std::shared_ptr<Expr> expr = orExpression();
 
         if (match(EQUAL)) {
             const Token equals = previous();
@@ -101,6 +101,27 @@ namespace lox {
             error(equals, "Invalid assignment target.");
         }
 
+        return expr;
+    }
+
+    std::shared_ptr<Expr> Parser::orExpression() {
+        std::shared_ptr<Expr> expr = andExpression();
+        while (match(OR)) {
+            Token op = previous();
+            std::shared_ptr<Expr> right = andExpression();
+            expr = std::make_shared<Logical>(expr, op, right);
+        }
+        return expr;
+    }
+
+    std::shared_ptr<Expr> Parser::andExpression() {
+        std::shared_ptr<Expr> expr = equality();
+
+        while (match(AND)) {
+            Token op = previous();
+            std::shared_ptr<Expr> right = equality();
+            expr = std::make_shared<Logical>(expr, op, right);
+        }
         return expr;
     }
 
@@ -161,7 +182,7 @@ namespace lox {
     std::shared_ptr<Expr> Parser::primary() {
         if (match(FALSE)) return std::make_shared<Literal>(false);
         if (match(TRUE)) return std::make_shared<Literal>(true);
-        if (match(NIL)) return std::make_shared<Literal>(nullptr);
+        if (match(NIL)) return std::make_shared<Literal>(std::monostate{});
 
         if (match(NUMBER, STRING)) return std::make_shared<Literal>(previous().getLiteral());
 
