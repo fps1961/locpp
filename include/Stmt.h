@@ -9,6 +9,7 @@ namespace lox {
     class If;
     class Print;
     class Var;
+    class While;
 
     class StmtVisitor {
     public:
@@ -23,6 +24,8 @@ namespace lox {
         virtual TokenLiteral visitPrintStmt(const Print &stmt) = 0;
 
         virtual TokenLiteral visitVarStmt(const Var &stmt) = 0;
+
+        virtual TokenLiteral visitWhileStmt(const While &stmt) = 0;
     };
 
     class Stmt {
@@ -111,5 +114,22 @@ namespace lox {
 
         [[nodiscard]] const Token &getName() const { return name; }
         [[nodiscard]] const std::shared_ptr<Expr> &getInitializer() const { return initializer; }
+    };
+
+    class While final : public Stmt {
+        std::shared_ptr<Expr> condition;
+        std::shared_ptr<Stmt> body;
+
+    public:
+        While(std::shared_ptr<Expr> condition, std::shared_ptr<Stmt> body)
+            : condition(std::move(condition)), body(std::move(body)) {
+        }
+
+        TokenLiteral accept(StmtVisitor &visitor) const override {
+            return visitor.visitWhileStmt(*this);
+        }
+
+        [[nodiscard]] const std::shared_ptr<Expr> &getCondition() const { return condition; }
+        [[nodiscard]] const std::shared_ptr<Stmt> &getBody() const { return body; }
     };
 }

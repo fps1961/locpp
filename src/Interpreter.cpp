@@ -117,6 +117,14 @@ namespace lox {
         return {};
     }
 
+    TokenLiteral Interpreter::visitWhileStmt(const While &stmt) {
+        while (isTruthy(evaluate(stmt.getCondition()))) {
+            execute(stmt.getBody());
+        }
+        return {};
+    }
+
+
     TokenLiteral Interpreter::visitAssignExpr(const Assign &expr) {
         TokenLiteral value = evaluate(expr.getValue());
         environment->assign(expr.getName(), value);

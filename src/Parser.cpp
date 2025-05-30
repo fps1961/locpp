@@ -37,6 +37,7 @@ namespace lox {
     std::shared_ptr<Stmt> Parser::statement() {
         if (match(IF)) return ifStatement();
         if (match(PRINT)) return printStatement();
+        if (match(WHILE)) return whileStatement();
         if (match(LEFT_BRACE)) return std::make_shared<Block>(block());
 
         return expressionStatement();
@@ -68,6 +69,15 @@ namespace lox {
 
         consume(SEMICOLON, "Expect ';' after variable declaration.");
         return std::make_shared<Var>(name, initializer);
+    }
+
+    std::shared_ptr<Stmt> Parser::whileStatement() {
+        consume(LEFT_PAREN, "Expect '(' after 'while'.");
+        std::shared_ptr<Expr> condition = expression();
+        consume(RIGHT_PAREN, "Expect ')' after condition.");
+        std::shared_ptr<Stmt> body = statement();
+
+        return std::make_shared<While>(condition, body);
     }
 
 

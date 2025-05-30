@@ -34,6 +34,8 @@ namespace lox {
 
         TokenLiteral visitVarStmt(const Var &stmt) override;
 
+        TokenLiteral visitWhileStmt(const While &stmt) override;
+
         TokenLiteral visitAssignExpr(const Assign &expr) override;
 
         TokenLiteral visitBlockStmt(const Block &stmt) override;
