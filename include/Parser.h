@@ -66,6 +66,10 @@ namespace lox {
 
         std::shared_ptr<Expr> unary();
 
+        std::shared_ptr<Expr> finishCall(std::shared_ptr<Expr> &calle);
+
+        std::shared_ptr<Expr> call();
+
         std::shared_ptr<Expr> primary();
 
         template<typename... T>

@@ -6,6 +6,7 @@
 namespace lox {
     class Assign;
     class Binary;
+    class Call;
     class Grouping;
     class Literal;
     class Logical;
@@ -19,6 +20,8 @@ namespace lox {
         virtual TokenLiteral visitAssignExpr(const Assign &expr) = 0;
 
         virtual TokenLiteral visitBinaryExpr(const Binary &expr) = 0;
+
+        virtual TokenLiteral visitCallExpr(const Call &expr) = 0;
 
         virtual TokenLiteral visitGroupingExpr(const Grouping &expr) = 0;
 
@@ -72,6 +75,25 @@ namespace lox {
         [[nodiscard]] const std::shared_ptr<Expr> &getLeft() const { return left; }
         [[nodiscard]] const Token &getOp() const { return op; }
         [[nodiscard]] const std::shared_ptr<Expr> &getRight() const { return right; }
+    };
+
+    class Call final : public Expr {
+        std::shared_ptr<Expr> calle;
+        Token paren;
+        std::vector<std::shared_ptr<Expr> > arguments;
+
+    public:
+        Call(std::shared_ptr<Expr> calle, Token paren, std::vector<std::shared_ptr<Expr> > arguments)
+            : calle(std::move(calle)), paren(std::move(paren)), arguments(std::move(arguments)) {
+        }
+
+        TokenLiteral accept(ExprVisitor &visitor) const override {
+            return visitor.visitCallExpr(*this);
+        }
+
+        [[nodiscard]] const std::shared_ptr<Expr> &getCalle() const { return calle; }
+        [[nodiscard]] const Token &getParen() const { return paren; }
+        [[nodiscard]] const std::vector<std::shared_ptr<Expr> > &getArguments() const { return arguments; }
     };
 
     class Grouping final : public Expr {
