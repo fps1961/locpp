@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "../include/Lox.h"
+#include "../include/LoxCallable.h"
 #include "../include/RuntimeError.h"
 //
 // Created by sheshan on 3/27/2025.
@@ -98,8 +99,30 @@ namespace lox {
                 break;
         }
 
-        return nullptr;
+        return {};
     }
+
+    TokenLiteral Interpreter::visitCallExpr(const Call &expr) {
+        TokenLiteral callee = evaluate(expr.getCalle());
+
+        std::vector<TokenLiteral> arguments{};
+
+        for (const auto &argument: expr.getArguments()) {
+            arguments.push_back(evaluate(argument));
+        }
+
+        if (const auto callable = std::get_if<std::shared_ptr<LoxCallable> >(&callee)) {
+            if (static_cast<int>(arguments.size()) != callable->get()->arity()) {
+                throw new RuntimeError(expr.getParen(),
+                                       "Expected " + std::to_string(callable->get()->arity()) + " arguments but got " +
+                                       std::to_string(arguments.size())
+                                       + ".");
+            }
+            return callable->get()->call(*this, std::move(arguments));
+        }
+        throw new RuntimeError(expr.getParen(), "Can only call functions and classes.");
+    }
+
 
     TokenLiteral Interpreter::visitPrintStmt(const Print &stmt) {
         TokenLiteral value = evaluate(stmt.getExpression());

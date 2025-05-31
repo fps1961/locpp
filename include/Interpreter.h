@@ -26,6 +26,8 @@ namespace lox {
 
         TokenLiteral visitBinaryExpr(const Binary &expr) override;
 
+        TokenLiteral visitCallExpr(const Call &expr) override;
+
         TokenLiteral visitExpressionStmt(const Expression &stmp) override;
 
         TokenLiteral visitIfStmt(const If &stmt) override;

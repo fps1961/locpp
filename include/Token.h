@@ -3,20 +3,21 @@
 //
 
 #pragma once
+#include <memory>
 #include <string>
 #include <variant>
 
+#include "LoxCallable.h"
 #include "Token.h"
 #include "TokenType.h"
 
 namespace lox {
-    using TokenLiteral = std::variant<std::monostate, std::string, double, bool>;
-
     struct TokenLiteralToString {
         std::string operator()(std::monostate) const { return "nil"; }
         std::string operator()(const std::string &s) const { return s; }
         std::string operator()(const double d) const { return std::to_string(d); }
         std::string operator()(const bool b) const { return b ? "true" : "false"; }
+        std::string operator()(const std::shared_ptr<LoxCallable> &func) const { return func->toString(); }
     };
 
     struct TokenLiteralToBoolean {
@@ -24,6 +25,10 @@ namespace lox {
         bool operator()(const std::string &s) const { return !s.empty(); }
         bool operator()(const double d) const { return d != 0.0; }
         bool operator()(const bool b) const { return b; }
+
+        bool operator()(const std::shared_ptr<LoxCallable> &func) const {
+            return std::visit(TokenLiteralToBoolean{}, func->call());
+        }
     };
 
     class Token {
