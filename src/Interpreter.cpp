@@ -1,4 +1,6 @@
 #include "../include/Interpreter.h"
+
+#include <chrono>
 #include <iostream>
 
 #include "../include/Lox.h"
@@ -8,6 +10,10 @@
 // Created by sheshan on 3/27/2025.
 //
 namespace lox {
+    Interpreter::Interpreter() {
+        globals->define("clock", std::shared_ptr<NativeClock>{});
+    }
+
     void Interpreter::interpret(const std::vector<std::shared_ptr<Stmt> > &statements) {
         try {
             for (auto statement: statements) {
@@ -233,5 +239,19 @@ namespace lox {
 
     std::string Interpreter::stringify(TokenLiteral &object) {
         return std::visit(TokenLiteralToString{}, object);
+    }
+
+
+    int NativeClock::arity() {
+        return 0;
+    }
+
+    TokenLiteral NativeClock::call(Interpreter &interpreter, std::vector<TokenLiteral> arguments) {
+        const auto ticks = std::chrono::system_clock::now().time_since_epoch();
+        return std::chrono::duration<double>(ticks).count() / 1000.0;
+    }
+
+    std::string NativeClock::toString() {
+        return "<native fn>";
     }
 }
