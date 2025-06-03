@@ -12,6 +12,10 @@
 namespace lox {
     class Interpreter : public ExprVisitor, public StmtVisitor {
     public:
+        std::shared_ptr<Environment> globals{new Environment};
+
+        Interpreter();
+
         void interpret(const std::vector<std::shared_ptr<Stmt> > &statements);
 
         TokenLiteral visitGroupingExpr(const Grouping &expr) override;
@@ -43,7 +47,7 @@ namespace lox {
         TokenLiteral visitBlockStmt(const Block &stmt) override;
 
     private:
-        std::shared_ptr<Environment> environment{new Environment};
+        std::shared_ptr<Environment> environment = globals;
 
         [[nodiscard]] bool isTruthy(TokenLiteral token_literal) const;
 
@@ -61,5 +65,13 @@ namespace lox {
                           const std::shared_ptr<Environment> &environment);
 
         std::string stringify(TokenLiteral &object);
+    };
+
+    class NativeClock : public LoxCallable {
+        int arity() override;
+
+        std::string toString() override;
+
+        TokenLiteral call() override;
     };
 }
