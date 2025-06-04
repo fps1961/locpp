@@ -13,6 +13,7 @@ namespace lox {
     class Interpreter : public ExprVisitor, public StmtVisitor {
     public:
         std::shared_ptr<Environment> globals{new Environment};
+        friend class LoxFunction;
 
         Interpreter();
 
@@ -33,6 +34,8 @@ namespace lox {
         TokenLiteral visitCallExpr(const Call &expr) override;
 
         TokenLiteral visitExpressionStmt(const Expression &stmp) override;
+
+        TokenLiteral visitFunctionStmt(const Function &stmt) override;
 
         TokenLiteral visitIfStmt(const If &stmt) override;
 
@@ -73,5 +76,7 @@ namespace lox {
         std::string toString() override;
 
         TokenLiteral call() override;
+
+        TokenLiteral call(Interpreter &interpreter, std::vector<TokenLiteral> &arguments) override;
     };
 }

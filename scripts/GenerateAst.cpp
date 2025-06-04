@@ -191,6 +191,7 @@ int main(const int argc, char *argv[]) {
     defineAst(outputDir, "Stmt", {
                   "Block        : std::vector<std::shared_ptr<Stmt>> statements",
                   "Expression   : Expr expression",
+                  "Function     : Token name, std::vector<Token> params, std::vector<std::shared_ptr<Stmt>> body",
                   "If           : Expr condition, Stmt thenBranch, Stmt elseBranch",
                   "Print        : Expr expression",
                   "Var          : Token name, Expr initializer",

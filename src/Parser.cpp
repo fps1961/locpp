@@ -25,6 +25,7 @@ namespace lox {
 
     std::shared_ptr<Stmt> Parser::declaration() {
         try {
+            if (match(FUN)) return function("function");
             if (match(VAR)) return varDeclaration();
             return statement();
         } catch (ParseError &error) {
@@ -133,6 +134,27 @@ namespace lox {
         consume(SEMICOLON, "Expect ';' after expression.");
         return std::make_shared<Expression>(expr);
     }
+
+    std::shared_ptr<Stmt> Parser::function(const std::string &kind) {
+        Token name = consume(IDENTIFIER, "Expect " + kind + "name.");
+        consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
+        std::vector<Token> parameters{};
+        if (!check(RIGHT_PAREN)) {
+            do {
+                if (parameters.size() >= 255) {
+                    error(peek(), "Can't have more than 255 parameters.");
+                }
+                parameters.push_back(consume(IDENTIFIER, "Expect parameter name."));
+            } while (match(COMMA));
+        }
+
+        consume(RIGHT_PAREN, "Expect ')' after parameters.");
+
+        consume(LEFT_BRACE, "Expect '{' before " + kind + " body.");
+        std::vector<std::shared_ptr<Stmt> > body = block();
+        return std::make_shared<Function>(name, parameters, body);
+    }
+
 
     std::vector<std::shared_ptr<Stmt> > Parser::block() {
         std::vector<std::shared_ptr<Stmt> > statements{};

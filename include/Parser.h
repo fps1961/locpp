@@ -48,6 +48,8 @@ namespace lox {
 
         std::shared_ptr<Stmt> expressionStatement();
 
+        std::shared_ptr<Stmt> function(const std::string &kind);
+
         std::vector<std::shared_ptr<Stmt> > block();
 
         std::shared_ptr<Expr> assignment();

@@ -1,0 +1,38 @@
+//
+// Created by shesh on 6/3/2025.
+//
+
+#include "../include/LoxFunction.h"
+
+#include <variant>
+#include <vector>
+
+#include "../include/Environment.h"
+#include "../include/Interpreter.h"
+
+namespace lox {
+    LoxFunction::LoxFunction(std::shared_ptr<Function> declaration) : declaration(std::move(declaration)) {
+    };
+
+    TokenLiteral LoxFunction::call() {
+        return {};
+    }
+
+    TokenLiteral LoxFunction::call(Interpreter &interpreter, std::vector<TokenLiteral> &arguments) {
+        const auto environment = std::make_shared<Environment>(interpreter.globals);
+        for (size_t i = 0; i < declaration->getParams().size(); ++i) {
+            environment->define(declaration->getParams()[i].getLexeme(), arguments[i]);
+        }
+
+        interpreter.executeBlock(declaration->getBody(), environment);
+        return {};
+    }
+
+    int LoxFunction::arity() {
+        return declaration->getParams().size();
+    }
+
+    std::string LoxFunction::toString() {
+        return "<fn" + declaration->getName().getLexeme() + ">";
+    }
+}

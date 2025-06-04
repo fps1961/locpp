@@ -6,6 +6,7 @@
 namespace lox {
     class Block;
     class Expression;
+    class Function;
     class If;
     class Print;
     class Var;
@@ -18,6 +19,8 @@ namespace lox {
         virtual TokenLiteral visitBlockStmt(const Block &stmt) = 0;
 
         virtual TokenLiteral visitExpressionStmt(const Expression &stmt) = 0;
+
+        virtual TokenLiteral visitFunctionStmt(const Function &stmt) = 0;
 
         virtual TokenLiteral visitIfStmt(const If &stmt) = 0;
 
@@ -63,6 +66,25 @@ namespace lox {
         }
 
         [[nodiscard]] const std::shared_ptr<Expr> &getExpression() const { return expression; }
+    };
+
+    class Function final : public Stmt {
+        Token name;
+        std::vector<Token> params;
+        std::vector<std::shared_ptr<Stmt> > body;
+
+    public:
+        Function(Token name, std::vector<Token> params, std::vector<std::shared_ptr<Stmt> > body)
+            : name(std::move(name)), params(std::move(params)), body(std::move(body)) {
+        }
+
+        TokenLiteral accept(StmtVisitor &visitor) const override {
+            return visitor.visitFunctionStmt(*this);
+        }
+
+        [[nodiscard]] const Token &getName() const { return name; }
+        [[nodiscard]] const std::vector<Token> &getParams() const { return params; }
+        [[nodiscard]] const std::vector<std::shared_ptr<Stmt> > &getBody() const { return body; }
     };
 
     class If final : public Stmt {

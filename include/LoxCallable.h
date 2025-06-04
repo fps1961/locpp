@@ -11,7 +11,9 @@ namespace lox {
 
     class LoxCallable {
     public:
-        virtual TokenLiteral call(Interpreter &interpreter, std::vector<TokenLiteral> arguments) = 0;
+        virtual ~LoxCallable() = default;
+
+        virtual TokenLiteral call(Interpreter &interpreter, std::vector<TokenLiteral> &arguments) = 0;
 
         virtual std::string toString() = 0;
 

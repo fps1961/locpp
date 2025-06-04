@@ -5,6 +5,7 @@
 
 #include "../include/Lox.h"
 #include "../include/LoxCallable.h"
+#include "../include/LoxFunction.h"
 #include "../include/RuntimeError.h"
 //
 // Created by sheshan on 3/27/2025.
@@ -124,7 +125,7 @@ namespace lox {
                                        std::to_string(arguments.size())
                                        + ".");
             }
-            return callable->get()->call(*this, std::move(arguments));
+            return callable->get()->call(*this, arguments);
         }
         throw new RuntimeError(expr.getParen(), "Can only call functions and classes.");
     }
@@ -165,6 +166,13 @@ namespace lox {
         evaluate(stmp.getExpression());
         return {};
     }
+
+    TokenLiteral Interpreter::visitFunctionStmt(const Function &stmt) {
+        auto function = std::make_shared<LoxFunction>(std::make_shared<Function>(stmt));
+        environment->define(stmt.getName().getLexeme(), function);
+        return {};
+    }
+
 
     TokenLiteral Interpreter::visitIfStmt(const If &stmt) {
         if (isTruthy(evaluate(stmt.getCondition()))) {
@@ -251,6 +259,11 @@ namespace lox {
         const auto ticks = std::chrono::system_clock::now().time_since_epoch();
         return std::chrono::duration<double>(ticks).count() / 1000.0;
     }
+
+    TokenLiteral NativeClock::call(Interpreter &/*interpreter*/, std::vector<TokenLiteral> &/*arguments*/) {
+        return call();
+    }
+
 
     std::string NativeClock::toString() {
         return "<native fn>";
