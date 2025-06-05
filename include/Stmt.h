@@ -9,6 +9,7 @@ namespace lox {
     class Function;
     class If;
     class Print;
+    class Return;
     class Var;
     class While;
 
@@ -25,6 +26,8 @@ namespace lox {
         virtual TokenLiteral visitIfStmt(const If &stmt) = 0;
 
         virtual TokenLiteral visitPrintStmt(const Print &stmt) = 0;
+
+        virtual TokenLiteral visitReturnStmt(const Return &stmt) = 0;
 
         virtual TokenLiteral visitVarStmt(const Var &stmt) = 0;
 
@@ -119,6 +122,23 @@ namespace lox {
         }
 
         [[nodiscard]] const std::shared_ptr<Expr> &getExpression() const { return expression; }
+    };
+
+    class Return final : public Stmt {
+        Token keyword;
+        std::shared_ptr<Expr> value;
+
+    public:
+        Return(Token keyword, std::shared_ptr<Expr> value)
+            : keyword(std::move(keyword)), value(std::move(value)) {
+        }
+
+        TokenLiteral accept(StmtVisitor &visitor) const override {
+            return visitor.visitReturnStmt(*this);
+        }
+
+        [[nodiscard]] const Token &getKeyword() const { return keyword; }
+        [[nodiscard]] const std::shared_ptr<Expr> &getValue() const { return value; }
     };
 
     class Var final : public Stmt {

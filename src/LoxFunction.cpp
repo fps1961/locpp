@@ -9,6 +9,7 @@
 
 #include "../include/Environment.h"
 #include "../include/Interpreter.h"
+#include "../include/LoxReturn.h"
 
 namespace lox {
     LoxFunction::LoxFunction(std::shared_ptr<Function> declaration) : declaration(std::move(declaration)) {
@@ -24,7 +25,11 @@ namespace lox {
             environment->define(declaration->getParams()[i].getLexeme(), arguments[i]);
         }
 
-        interpreter.executeBlock(declaration->getBody(), environment);
+        try {
+            interpreter.executeBlock(declaration->getBody(), environment);
+        } catch (LoxReturn returnValue) {
+            return returnValue.value;
+        }
         return {};
     }
 

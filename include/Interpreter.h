@@ -41,6 +41,8 @@ namespace lox {
 
         TokenLiteral visitPrintStmt(const Print &stmt) override;
 
+        TokenLiteral visitReturnStmt(const Return &stmt) override;
+
         TokenLiteral visitVarStmt(const Var &stmt) override;
 
         TokenLiteral visitWhileStmt(const While &stmt) override;

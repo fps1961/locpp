@@ -6,6 +6,7 @@
 #include "../include/Lox.h"
 #include "../include/LoxCallable.h"
 #include "../include/LoxFunction.h"
+#include "../include/LoxReturn.h"
 #include "../include/RuntimeError.h"
 //
 // Created by sheshan on 3/27/2025.
@@ -135,6 +136,13 @@ namespace lox {
         TokenLiteral value = evaluate(stmt.getExpression());
         std::cout << stringify(value) << "\n";
         return {};
+    }
+
+    TokenLiteral Interpreter::visitReturnStmt(const Return &stmt) {
+        TokenLiteral value{};
+        if (stmt.getValue() != nullptr) value = evaluate(stmt.getValue());
+
+        throw LoxReturn{value};
     }
 
 

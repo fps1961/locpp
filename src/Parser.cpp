@@ -39,6 +39,7 @@ namespace lox {
         if (match(FOR)) return forStatement();
         if (match(IF)) return ifStatement();
         if (match(PRINT)) return printStatement();
+        if (match(RETURN)) return returnStatement();
         if (match(WHILE)) return whileStatement();
         if (match(LEFT_BRACE)) return std::make_shared<Block>(block());
 
@@ -108,6 +109,18 @@ namespace lox {
         consume(SEMICOLON, "Expect ';' after expression.");
         return std::make_shared<Print>(expr);
     }
+
+    std::shared_ptr<Stmt> Parser::returnStatement() {
+        Token keyword = previous();
+        std::shared_ptr<Expr> value = nullptr;
+        if (!check(SEMICOLON)) {
+            value = expression();
+        }
+
+        consume(SEMICOLON, "Expect ';' after return value.");
+        return std::make_shared<Return>(keyword, value);
+    }
+
 
     std::shared_ptr<Stmt> Parser::varDeclaration() {
         Token name = consume(IDENTIFIER, "Expect variable name.");
