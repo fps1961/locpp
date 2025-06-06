@@ -176,7 +176,8 @@ namespace lox {
     }
 
     TokenLiteral Interpreter::visitFunctionStmt(const Function &stmt) {
-        auto function = std::make_shared<LoxFunction>(std::make_shared<Function>(stmt));
+        auto function = std::make_shared<LoxFunction>(std::make_shared<Function>(stmt),
+                                                      std::make_shared<Environment>(environment));
         environment->define(stmt.getName().getLexeme(), function);
         return {};
     }

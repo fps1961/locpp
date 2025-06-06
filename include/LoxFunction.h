@@ -7,13 +7,21 @@
 
 
 namespace lox {
+    class Environment;
+}
+
+namespace lox {
     class Function;
 
     class LoxFunction : public LoxCallable {
         std::shared_ptr<Function> declaration;
+        std::shared_ptr<Environment> closure;
 
     public:
-        explicit LoxFunction(std::shared_ptr<Function> declaration);
+        explicit LoxFunction(std::shared_ptr<Function> declaration,
+                             std::shared_ptr<Environment> environment) : declaration(std::move(declaration)),
+                                                                         closure(std::move(environment)) {
+        };
 
         TokenLiteral call() override;
 
