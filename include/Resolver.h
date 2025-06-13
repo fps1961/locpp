@@ -19,6 +19,8 @@ namespace lox {
 
         TokenLiteral visitBlockStmt(const Block &stmt) override;
 
+        TokenLiteral visitVarStmt(const Var &stmt) override;
+
     private:
         void resolve(const std::vector<std::shared_ptr<Stmt> > &stmts);
 
@@ -28,5 +30,8 @@ namespace lox {
 
         void beginScope() { scopes.push_back(std::unordered_map<std::string, bool>{}); };
         void endScope() { scopes.pop_back(); };
+
+        void declare(Token &name);
+        void resolve(Token &name);
     };
 }
