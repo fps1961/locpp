@@ -3,8 +3,9 @@
 //
 
 #include "../include/Resolver.h"
-
 #include <unordered_map>
+
+#include "../include/Lox.h"
 
 namespace lox {
     TokenLiteral Resolver::visitBlockStmt(const Block &stmt) {
@@ -20,6 +21,16 @@ namespace lox {
             resolve(stmt.getInitializer());
         }
         define(stmt.getName());
+        return {};
+    }
+
+    TokenLiteral Resolver::visitVariableExpr(const Variable &expr) {
+        if (!scopes.empty() && scopes.back().contains(expr.getName().getLexeme()) && scopes.back().at(
+                expr.getName().getLexeme()) == false) {
+            Lox::error(expr.getName(), "Can't read local variable in its own initialization.");
+        }
+
+        resolveLocal(expr, expr.name);
         return {};
     }
 
@@ -45,6 +56,23 @@ namespace lox {
         auto &scope = scopes.back();
         scope[name.getLexeme()] = false;
     }
+
+    void Resolver::define(Token &name) {
+        if (scopes.empty()) {
+            return;
+        }
+        auto &scope = scopes.back();
+        scope[name.getLexeme()] = true;
+    }
+
+    void Resolver::resolveLocal(Variable &expr, Token &name) {
+        for (int i = scopes.size() - 1; i >= 0; i--) {
+            if (scopes[i].contains(name.getLexeme())) {
+                interpreter.resolve(expr, scopes.size() - 1 - i);
+            }
+        }
+    }
+
 
     void Resolver::resolve(Token &name) {
         if (scopes.empty()) { return; }
