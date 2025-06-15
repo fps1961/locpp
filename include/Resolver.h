@@ -23,6 +23,8 @@ namespace lox {
 
         TokenLiteral visitVariableExpr(const Variable &expr) override;
 
+        TokenLiteral visitAssignExpr(const Assign &expr) override;
+
     private:
         void resolve(const std::vector<std::shared_ptr<Stmt> > &stmts);
 
@@ -37,7 +39,7 @@ namespace lox {
 
         void define(Token &name);
 
-        void resolveLocal(Variable &expr, Token &name);
+        void resolveLocal(Expr &expr, Token &name);
 
         void resolve(Token &name);
     };

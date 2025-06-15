@@ -34,6 +34,12 @@ namespace lox {
         return {};
     }
 
+    TokenLiteral Resolver::visitAssignExpr(const Assign &expr) {
+        resolve(expr.getValue());
+        resolveLocal(expr, expr.getName());
+        return {};
+    }
+
 
     void Resolver::resolve(const std::vector<std::shared_ptr<Stmt> > &stmts) {
         for (const auto &stmt: stmts) {
@@ -65,7 +71,7 @@ namespace lox {
         scope[name.getLexeme()] = true;
     }
 
-    void Resolver::resolveLocal(Variable &expr, Token &name) {
+    void Resolver::resolveLocal(Expr &expr, Token &name) {
         for (int i = scopes.size() - 1; i >= 0; i--) {
             if (scopes[i].contains(name.getLexeme())) {
                 interpreter.resolve(expr, scopes.size() - 1 - i);
