@@ -38,13 +38,13 @@ namespace lox {
             Lox::error(expr.getName(), "Can't read local variable in its own initialization.");
         }
 
-        resolveLocal(expr, expr.name);
+        resolveLocal(std::make_shared<Variable>(expr), expr.name);
         return {};
     }
 
     TokenLiteral Resolver::visitAssignExpr(const Assign &expr) {
         resolve(expr.getValue());
-        resolveLocal(expr, expr.getName());
+        resolveLocal(std::make_shared<Assign>(expr), expr.getName());
         return {};
     }
 
@@ -146,7 +146,7 @@ namespace lox {
     }
 
 
-    void Resolver::resolveLocal(Expr &expr, const Token &name) {
+    void Resolver::resolveLocal(const std::shared_ptr<Expr> &expr, const Token &name) {
         for (int i = scopes.size() - 1; i >= 0; i--) {
             if (scopes[i].contains(name.getLexeme())) {
                 interpreter.resolve(expr, scopes.size() - 1 - i);

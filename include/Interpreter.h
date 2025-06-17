@@ -51,8 +51,11 @@ namespace lox {
 
         TokenLiteral visitBlockStmt(const Block &stmt) override;
 
+        void resolve(const std::shared_ptr<Expr> &expr, int depth);
+
     private:
         std::shared_ptr<Environment> environment = globals;
+        std::unordered_map<std::shared_ptr<Expr>, int> locals;
 
         [[nodiscard]] bool isTruthy(TokenLiteral token_literal) const;
 
@@ -65,6 +68,7 @@ namespace lox {
         TokenLiteral evaluate(const std::shared_ptr<Expr> &expr);
 
         void execute(const std::shared_ptr<Stmt> &stmt);
+
 
         void executeBlock(const std::vector<std::shared_ptr<Stmt> > &statements,
                           const std::shared_ptr<Environment> &environment);

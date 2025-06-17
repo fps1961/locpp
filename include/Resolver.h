@@ -60,7 +60,7 @@ namespace lox {
 
         void resolveFunction(const Function &function);
 
-        void resolveLocal(Expr &expr, const Token &name);
+        void resolveLocal(const std::shared_ptr<Expr> &expr, const Token &name);
 
         void beginScope() { scopes.push_back(std::unordered_map<std::string, bool>{}); };
         void endScope() { scopes.pop_back(); };

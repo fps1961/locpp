@@ -238,6 +238,11 @@ namespace lox {
         stmt->accept(*this);
     }
 
+    void Interpreter::resolve(const std::shared_ptr<Expr> &expr, int depth) {
+        locals.insert({expr, depth});
+    }
+
+
     void Interpreter::executeBlock(const std::vector<std::shared_ptr<Stmt> > &statements,
                                    const std::shared_ptr<Environment> &environment) {
         auto previous = this->environment;

@@ -154,7 +154,7 @@ namespace lox {
             return visitor.visitVarStmt(*this);
         }
 
-        [[nodiscard]] Token &getName() const { return name; }
+        [[nodiscard]] const Token &getName() const { return name; }
         [[nodiscard]] const std::shared_ptr<Expr> &getInitializer() const { return initializer; }
     };
 
