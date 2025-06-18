@@ -5,6 +5,8 @@
 
 #include "../include/Environment.h"
 
+#include <future>
+
 #include "../include/RuntimeError.h"
 
 namespace lox {
@@ -17,6 +19,18 @@ namespace lox {
 
     void Environment::define(const std::string &name, const TokenLiteral &value) {
         values[name] = value;
+    }
+
+    TokenLiteral Environment::getAt(const int distance, const std::string &name)  {
+        return ancestor(distance)->values.at(name);
+    }
+
+    std::shared_ptr<Environment> Environment::ancestor(const int distance) {
+        auto environment = shared_from_this();
+        for (int i = 0; i < distance; i++) {
+            environment = environment->enclosing;
+        }
+        return environment;
     }
 
     TokenLiteral Environment::get(Token name) {

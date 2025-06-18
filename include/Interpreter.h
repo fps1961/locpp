@@ -74,6 +74,8 @@ namespace lox {
                           const std::shared_ptr<Environment> &environment);
 
         std::string stringify(TokenLiteral &object);
+
+        TokenLiteral lookUpVariable(const Token &name, const std::shared_ptr<Variable> &token);
     };
 
     class NativeClock : public LoxCallable {

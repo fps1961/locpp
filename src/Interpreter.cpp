@@ -2,6 +2,8 @@
 
 #include <chrono>
 #include <iostream>
+#include <variant>
+#include <variant>
 
 #include "../include/Lox.h"
 #include "../include/LoxCallable.h"
@@ -62,7 +64,7 @@ namespace lox {
     }
 
     TokenLiteral Interpreter::visitVariableExpr(const Variable &expr) {
-        return environment->get(expr.getName());
+        return lookUpVariable(expr.getName(), std::make_shared<Variable>(expr));
     }
 
     TokenLiteral Interpreter::visitBinaryExpr(const Binary &expr) {
@@ -262,6 +264,14 @@ namespace lox {
 
     std::string Interpreter::stringify(TokenLiteral &object) {
         return std::visit(TokenLiteralToString{}, object);
+    }
+
+    TokenLiteral Interpreter::lookUpVariable(const Token &name, const std::shared_ptr<Variable> &token) {
+        if (const auto distance = locals.find(token); distance != locals.end()) {
+            return environment->getAt(distance->second, name.getLexeme());
+        } else {
+            return globals->get(name);
+        }
     }
 
 
