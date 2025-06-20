@@ -6,16 +6,26 @@
 #include <unordered_map>
 
 #include "Expr.h"
+#include "Interpreter.h"
 #include "Stmt.h"
 
 namespace lox {
     class Resolver : public StmtVisitor, ExprVisitor {
+        enum class FunctionType {
+            NONE,
+            FUNCTION,
+        };
+
         Interpreter interpreter;
         std::vector<std::unordered_map<std::string, bool> > scopes;
+        FunctionType currentFunction = FunctionType::NONE;
 
     public:
-        Resolver(Interpreter &interpreter) : interpreter(interpreter) {
+        explicit Resolver(const Interpreter &interpreter) : interpreter(interpreter) {
         };
+
+        void resolve(const std::vector<std::shared_ptr<Stmt> > &stmts);
+
 
         TokenLiteral visitBlockStmt(const Block &stmt) override;
 
@@ -50,15 +60,13 @@ namespace lox {
         TokenLiteral visitUnaryExpr(const Unary &expr) override;
 
     private:
-        void resolve(const std::vector<std::shared_ptr<Stmt> > &stmts);
-
         void resolve(const std::shared_ptr<Stmt> &stmt);
 
         void resolve(const std::shared_ptr<Expr> &expr);
 
         void resolve(const Token &name);
 
-        void resolveFunction(const Function &function);
+        void resolveFunction(const Function &function, const FunctionType &type);
 
         void resolveLocal(const std::shared_ptr<Expr> &expr, const Token &name);
 

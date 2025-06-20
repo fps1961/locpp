@@ -19,7 +19,7 @@ namespace lox {
         declare(stmt.getName());
         define(stmt.getName());
 
-        resolveFunction(stmt);
+        resolveFunction(stmt, FunctionType::FUNCTION);
         return {};
     }
 
@@ -38,7 +38,7 @@ namespace lox {
             Lox::error(expr.getName(), "Can't read local variable in its own initialization.");
         }
 
-        resolveLocal(std::make_shared<Variable>(expr), expr.name);
+        resolveLocal(std::make_shared<Variable>(expr), expr.getName());
         return {};
     }
 
@@ -66,6 +66,9 @@ namespace lox {
     }
 
     TokenLiteral Resolver::visitReturnStmt(const Return &stmt) {
+        if (currentFunction != FunctionType::FUNCTION) {
+            Lox::error(stmt.getKeyword(), "Can't return from top-level code.");
+        }
         if (stmt.getValue() != nullptr) {
             resolve(stmt.getValue());
         }
@@ -98,7 +101,7 @@ namespace lox {
         return {};
     }
 
-    TokenLiteral Resolver::visitLiteralExpr(const Literal &expr) {
+    TokenLiteral Resolver::visitLiteralExpr(const Literal &) {
         return {};
     }
 
@@ -135,7 +138,9 @@ namespace lox {
         scope[name.getLexeme()] = true;
     }
 
-    void Resolver::resolveFunction(const Function &function) {
+    void Resolver::resolveFunction(const Function &function, const FunctionType &type) {
+        const FunctionType enclosingFunction = currentFunction;
+        currentFunction = type;
         beginScope();
         for (const auto &param: function.getParams()) {
             declare(param);
@@ -143,6 +148,7 @@ namespace lox {
         }
         resolve(function.getBody());
         endScope();
+        currentFunction = enclosingFunction;
     }
 
 
@@ -159,6 +165,11 @@ namespace lox {
             return;
         }
         auto &scope = scopes.back();
+
+        if (scope.contains(name.getLexeme())) {
+            Lox::error(name, "Already a variable with thsi name in this scope.");
+        }
+
         scope[name.getLexeme()] = false;
     }
 

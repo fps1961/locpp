@@ -10,6 +10,7 @@
 #include <sstream>
 
 #include "../include/Parser.h"
+#include "../include/Resolver.h"
 #include "../include/Scanner.h"
 #include "../scripts/AstPrinter/AstPrinter.h"
 
@@ -59,6 +60,11 @@ namespace lox {
         const std::vector<std::shared_ptr<Stmt> > statements = parser.parse();
 
         if (hadError) return;
+
+        Resolver resolver{interpreter};
+        resolver.resolve(statements);
+        if (hadError) return;
+
         interpreter.interpret(statements);
     }
 
