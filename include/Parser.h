@@ -34,6 +34,8 @@ namespace lox {
 
         std::shared_ptr<Stmt> declaration();
 
+        std::shared_ptr<Stmt> classDeclaration();
+
         std::shared_ptr<Stmt> statement();
 
         std::shared_ptr<Stmt> forStatement();
@@ -50,7 +52,7 @@ namespace lox {
 
         std::shared_ptr<Stmt> expressionStatement();
 
-        std::shared_ptr<Stmt> function(const std::string &kind);
+        std::shared_ptr<Function> function(const std::string &kind);
 
         std::vector<std::shared_ptr<Stmt> > block();
 
