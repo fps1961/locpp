@@ -7,6 +7,7 @@
 
 #include "../include/Lox.h"
 #include "../include/LoxCallable.h"
+#include "../include/LoxClass.h"
 #include "../include/LoxFunction.h"
 #include "../include/LoxReturn.h"
 #include "../include/RuntimeError.h"
@@ -197,6 +198,13 @@ namespace lox {
 
     TokenLiteral Interpreter::visitBlockStmt(const Block &stmt) {
         executeBlock(stmt.getStatements(), std::make_shared<Environment>(environment));
+        return {};
+    }
+
+    TokenLiteral Interpreter::visitClassStmt(const Class &stmt) {
+        environment->define(stmt.getName().getLexeme(), {});
+        TokenLiteral klass = std::make_shared<LoxClass>(stmt.getName().getLexeme());
+        environment->assign(stmt.getName(), klass);
         return {};
     }
 

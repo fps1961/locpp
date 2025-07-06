@@ -51,6 +51,8 @@ namespace lox {
 
         TokenLiteral visitBlockStmt(const Block &stmt) override;
 
+        TokenLiteral visitClassStmt(const Class &stmt) override;
+
         void resolve(const std::shared_ptr<Expr> &expr, int depth);
 
     private:

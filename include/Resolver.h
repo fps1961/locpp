@@ -29,6 +29,8 @@ namespace lox {
 
         TokenLiteral visitBlockStmt(const Block &stmt) override;
 
+        TokenLiteral visitClassStmt(const Class &stmt) override;
+
         TokenLiteral visitFunctionStmt(const Function &stmt) override;
 
         TokenLiteral visitVarStmt(const Var &stmt) override;

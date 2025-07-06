@@ -15,6 +15,13 @@ namespace lox {
         return {};
     }
 
+    TokenLiteral Resolver::visitClassStmt(const Class &stmt) {
+        declare(stmt.getName());
+        define(stmt.getName());
+        return {};
+    }
+
+
     TokenLiteral Resolver::visitFunctionStmt(const Function &stmt) {
         declare(stmt.getName());
         define(stmt.getName());

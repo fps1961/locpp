@@ -9,12 +9,14 @@
 
 namespace lox {
     class LoxCallable; // forward declaration
+    class LoxClass;
 
     using TokenLiteral = std::variant<
         std::monostate,
         std::string,
         double,
         bool,
-        std::shared_ptr<LoxCallable>
+        std::shared_ptr<LoxCallable>,
+        std::shared_ptr<LoxClass>
     >;
 }
