@@ -8,6 +8,10 @@
 #include <string>
 
 namespace lox {
+    class LoxInstance;
+}
+
+namespace lox {
     class LoxCallable; // forward declaration
     class LoxClass;
 
@@ -17,6 +21,7 @@ namespace lox {
         double,
         bool,
         std::shared_ptr<LoxCallable>,
-        std::shared_ptr<LoxClass>
+        std::shared_ptr<LoxClass>,
+        std::shared_ptr<LoxInstance>
     >;
 }

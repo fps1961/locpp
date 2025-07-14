@@ -7,6 +7,7 @@
 #include <string>
 #include <variant>
 
+#include "LoxInstance.h"
 #include "LoxCallable.h"
 #include "LoxClass.h"
 #include "Token.h"
@@ -18,6 +19,7 @@ namespace lox {
         std::string operator()(const std::string &s) const { return s; }
         std::string operator()(const double d) const { return std::to_string(d); }
         std::string operator()(const bool b) const { return b ? "true" : "false"; }
+        std::string operator()(const std::shared_ptr<LoxInstance> &func) const { return func->toString(); }
         std::string operator()(const std::shared_ptr<LoxCallable> &func) const { return func->toString(); }
         std::string operator()(const std::shared_ptr<LoxClass> &func) const { return func->toString(); }
     };
@@ -27,10 +29,12 @@ namespace lox {
         bool operator()(const std::string &s) const { return !s.empty(); }
         bool operator()(const double d) const { return d != 0.0; }
         bool operator()(const bool b) const { return b; }
+        bool operator()(const std::shared_ptr<LoxInstance> &) const { return true; }
 
         bool operator()(const std::shared_ptr<LoxCallable> &func) const {
             return std::visit(TokenLiteralToBoolean{}, func->call());
         }
+
         bool operator()(const std::shared_ptr<LoxClass> &) const { return true; }
     };
 
