@@ -25,6 +25,8 @@ namespace lox {
 
         TokenLiteral visitLogicalExpr(const Logical &expr) override;
 
+        TokenLiteral visitSetExpr(const Set &expr) override;
+
         TokenLiteral visitUnaryExpr(const Unary &expr) override;
 
         TokenLiteral visitVariableExpr(const Variable &expr) override;
@@ -32,6 +34,8 @@ namespace lox {
         TokenLiteral visitBinaryExpr(const Binary &expr) override;
 
         TokenLiteral visitCallExpr(const Call &expr) override;
+
+        TokenLiteral visitGetExpr(const Get &expr) override;
 
         TokenLiteral visitExpressionStmt(const Expression &stmp) override;
 

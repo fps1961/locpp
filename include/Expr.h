@@ -7,10 +7,12 @@ namespace lox {
     class Assign;
     class Binary;
     class Call;
+    class Get;
     class Grouping;
     class Literal;
     class Logical;
     class Unary;
+    class Set;
     class Variable;
 
     class ExprVisitor {
@@ -23,6 +25,8 @@ namespace lox {
 
         virtual TokenLiteral visitCallExpr(const Call &expr) = 0;
 
+        virtual TokenLiteral visitGetExpr(const Get &expr) = 0;
+
         virtual TokenLiteral visitGroupingExpr(const Grouping &expr) = 0;
 
         virtual TokenLiteral visitLiteralExpr(const Literal &expr) = 0;
@@ -30,6 +34,8 @@ namespace lox {
         virtual TokenLiteral visitLogicalExpr(const Logical &expr) = 0;
 
         virtual TokenLiteral visitUnaryExpr(const Unary &expr) = 0;
+
+        virtual TokenLiteral visitSetExpr(const Set &expr) = 0;
 
         virtual TokenLiteral visitVariableExpr(const Variable &expr) = 0;
     };
@@ -96,6 +102,23 @@ namespace lox {
         [[nodiscard]] const std::vector<std::shared_ptr<Expr> > &getArguments() const { return arguments; }
     };
 
+    class Get final : public Expr {
+        std::shared_ptr<Expr> object;
+        Token name;
+
+    public:
+        Get(std::shared_ptr<Expr> object, Token name)
+            : object(std::move(object)), name(std::move(name)) {
+        }
+
+        TokenLiteral accept(ExprVisitor &visitor) const override {
+            return visitor.visitGetExpr(*this);
+        }
+
+        [[nodiscard]] const std::shared_ptr<Expr> &getObject() const { return object; }
+        [[nodiscard]] const Token &getName() const { return name; }
+    };
+
     class Grouping final : public Expr {
         std::shared_ptr<Expr> expression;
 
@@ -160,6 +183,25 @@ namespace lox {
 
         [[nodiscard]] const Token &getOp() const { return op; }
         [[nodiscard]] const std::shared_ptr<Expr> &getRight() const { return right; }
+    };
+
+    class Set final : public Expr {
+        std::shared_ptr<Expr> object;
+        Token name;
+        std::shared_ptr<Expr> value;
+
+    public:
+        Set(std::shared_ptr<Expr> object, Token name, std::shared_ptr<Expr> value)
+            : object(std::move(object)), name(std::move(name)), value(std::move(value)) {
+        }
+
+        TokenLiteral accept(ExprVisitor &visitor) const override {
+            return visitor.visitSetExpr(*this);
+        }
+
+        [[nodiscard]] const std::shared_ptr<Expr> &getObject() const { return object; }
+        [[nodiscard]] const Token &getName() const { return name; }
+        [[nodiscard]] const std::shared_ptr<Expr> &getValue() const { return value; }
     };
 
     class Variable final : public Expr {

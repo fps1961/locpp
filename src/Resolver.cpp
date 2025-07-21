@@ -103,6 +103,12 @@ namespace lox {
         return {};
     }
 
+    TokenLiteral Resolver::visitGetExpr(const Get &expr) {
+        resolve(expr.getObject());
+        return {};
+    }
+
+
     TokenLiteral Resolver::visitGroupingExpr(const Grouping &expr) {
         resolve(expr.getExpression());
         return {};
@@ -115,6 +121,12 @@ namespace lox {
     TokenLiteral Resolver::visitLogicalExpr(const Logical &expr) {
         resolve(expr.getRight());
         resolve(expr.getLeft());
+        return {};
+    }
+
+    TokenLiteral Resolver::visitSetExpr(const Set &expr) {
+        resolve(expr.getValue());
+        resolve(expr.getObject());
         return {};
     }
 

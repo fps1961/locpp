@@ -47,6 +47,18 @@ namespace lox {
         return evaluate(expr.getRight());
     }
 
+    TokenLiteral Interpreter::visitSetExpr(const Set &expr) {
+        auto object = evaluate(expr.getObject());
+
+        if (const auto &loxInstance = std::get_if<std::shared_ptr<LoxInstance> >(&object)) {
+            auto value = evaluate(expr.getValue());
+            loxInstance->get()->set(expr.getName(), value);
+            return value;
+        }
+
+        throw new RuntimeError(expr.getName(), "Only Instances have fields.");
+    }
+
 
     TokenLiteral Interpreter::visitUnaryExpr(const Unary &expr) {
         const TokenLiteral right = evaluate(expr.getRight());
@@ -132,6 +144,15 @@ namespace lox {
             return callable->get()->call(*this, arguments);
         }
         throw new RuntimeError(expr.getParen(), "Can only call functions and classes.");
+    }
+
+    TokenLiteral Interpreter::visitGetExpr(const Get &expr) {
+        TokenLiteral object = evaluate(expr.getObject());
+        if (const auto &loxInstance = std::get_if<std::shared_ptr<LoxInstance> >(&object)) {
+            return loxInstance->get()->get(expr.getName());
+        }
+
+        throw new RuntimeError(expr.getName(), "Only instances have properties");
     }
 
 

@@ -182,10 +182,12 @@ int main(const int argc, char *argv[]) {
                   "Assign : Token name, Expr value",
                   "Binary   : Expr left, Token op, Expr right",
                   "Call     : Expr calle, Token paren, std::vector<std::shared_ptr<Expr>> arguments",
+                  "Get      : Expr object, Token name",
                   "Grouping : Expr expression",
                   "Literal  : TokenLiteral value",
                   "Logical  : Expr left, Token op, Expr right",
                   "Unary    : Token op, Expr right",
+                  "Set      : Expr object, Token name, Expr value",
                   "Variable : Token name"
               });
     defineAst(outputDir, "Stmt", {

@@ -53,11 +53,17 @@ namespace lox {
 
         TokenLiteral visitCallExpr(const Call &expr) override;
 
+        TokenLiteral visitGetExpr(const Get &expr) override;
+
+
         TokenLiteral visitGroupingExpr(const Grouping &expr) override;
 
         TokenLiteral visitLiteralExpr(const Literal &expr) override;
 
         TokenLiteral visitLogicalExpr(const Logical &expr) override;
+
+        TokenLiteral visitSetExpr(const Set &expr) override;
+
 
         TokenLiteral visitUnaryExpr(const Unary &expr) override;
 

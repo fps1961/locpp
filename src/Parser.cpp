@@ -199,9 +199,11 @@ namespace lox {
             const Token equals = previous();
             std::shared_ptr<Expr> value = assignment();
 
-            if (const Variable *e = dynamic_cast<Variable *>(expr.get())) {
-                Token name = e->getName();
+            if (const Variable *variableExpr = dynamic_cast<Variable *>(expr.get())) {
+                Token name = variableExpr->getName();
                 return std::make_shared<Assign>(name, value);
+            } else if (const Get *getExpr = dynamic_cast<Get *>(expr.get())) {
+                return std::make_shared<Set>(getExpr->getObject(), getExpr->getName(), value);
             }
             error(equals, "Invalid assignment target.");
         }
@@ -306,6 +308,9 @@ namespace lox {
         while (true) {
             if (match(LEFT_PAREN)) {
                 expr = finishCall(expr);
+            } else if (match(DOT)) {
+                Token name = consume(IDENTIFIER, "Expect '.' after arguments.");
+                expr = std::make_shared<Get>(expr, name);
             } else {
                 break;
             }
