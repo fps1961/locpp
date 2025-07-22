@@ -23,6 +23,11 @@ namespace lox {
             return fields[name.getLexeme()];
         }
 
+        if (const auto &method = loxClass->findMethod(name.getLexeme());
+            method != nullptr) {
+            return method;
+        };
+
         throw new RuntimeError(name, "Undefined property '" + name.getLexeme() + "'.");
     }
 

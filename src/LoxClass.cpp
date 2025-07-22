@@ -9,9 +9,20 @@
 #include "../include/TokenLiteral.h"
 
 namespace lox {
+    LoxClass::LoxClass(std::string name,
+                       std::unordered_map<std::string, std::shared_ptr<LoxFunction> > &methods): name(std::move(name)),
+        methods(std::move(methods)) {
+    };
+
+    std::shared_ptr<LoxFunction> LoxClass::findMethod(std::string name) {
+        if (methods.contains(name)) {
+            return methods[name];
+        }
+        return nullptr;
+    }
 
 
-    TokenLiteral LoxClass::call(Interpreter&, std::vector<TokenLiteral>&) {
+    TokenLiteral LoxClass::call(Interpreter &, std::vector<TokenLiteral> &) {
         auto loxInstance = std::make_shared<LoxInstance>(shared_from_this());
         return loxInstance;
     }
@@ -20,6 +31,5 @@ namespace lox {
         return name;
     }
 
-    int LoxClass::arity() {return 0;}
-
+    int LoxClass::arity() { return 0; }
 }

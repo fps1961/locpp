@@ -8,12 +8,11 @@
 #include <string>
 
 namespace lox {
-    class LoxInstance;
-}
-
-namespace lox {
     class LoxCallable; // forward declaration
     class LoxClass;
+    class LoxInstance;
+    class LoxFunction;
+
 
     using TokenLiteral = std::variant<
         std::monostate,
@@ -22,6 +21,7 @@ namespace lox {
         bool,
         std::shared_ptr<LoxCallable>,
         std::shared_ptr<LoxClass>,
-        std::shared_ptr<LoxInstance>
+        std::shared_ptr<LoxInstance>,
+        std::shared_ptr<LoxFunction>
     >;
 }

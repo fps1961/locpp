@@ -14,6 +14,7 @@ namespace lox {
         enum class FunctionType {
             NONE,
             FUNCTION,
+            METHOD
         };
 
         Interpreter interpreter;
