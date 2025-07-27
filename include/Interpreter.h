@@ -27,6 +27,8 @@ namespace lox {
 
         TokenLiteral visitSetExpr(const Set &expr) override;
 
+        TokenLiteral visitThisExpr(const This &expr) override;
+
         TokenLiteral visitUnaryExpr(const Unary &expr) override;
 
         TokenLiteral visitVariableExpr(const Variable &expr) override;
@@ -81,7 +83,7 @@ namespace lox {
 
         std::string stringify(TokenLiteral &object);
 
-        TokenLiteral lookUpVariable(const Token &name, const std::shared_ptr<Variable> &token);
+        TokenLiteral lookUpVariable(const Token &name, const std::shared_ptr<Expr> &token);
     };
 
     class NativeClock : public LoxCallable {

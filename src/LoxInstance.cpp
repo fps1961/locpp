@@ -25,7 +25,7 @@ namespace lox {
 
         if (const auto &method = loxClass->findMethod(name.getLexeme());
             method != nullptr) {
-            return method;
+            return method->bind(shared_from_this());
         };
 
         throw new RuntimeError(name, "Undefined property '" + name.getLexeme() + "'.");

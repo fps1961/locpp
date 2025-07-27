@@ -23,6 +23,8 @@ namespace lox {
                                                                          closure(std::move(environment)) {
         };
 
+        std::shared_ptr<LoxFunction> bind(const std::shared_ptr<LoxInstance>& loxInstance);
+
         TokenLiteral call() override;
 
         TokenLiteral call(Interpreter &interpreter, std::vector<TokenLiteral> &arguments) override;

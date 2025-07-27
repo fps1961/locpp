@@ -12,6 +12,14 @@
 #include "../include/LoxReturn.h"
 
 namespace lox {
+
+    std::shared_ptr<LoxFunction> LoxFunction::bind(const std::shared_ptr<LoxInstance> &loxInstance) {
+        auto environment = std::make_shared<Environment>(closure);
+        environment->define("this", loxInstance);
+        return std::make_shared<LoxFunction>(declaration, environment);
+    }
+
+
     TokenLiteral LoxFunction::call() {
         return {};
     }

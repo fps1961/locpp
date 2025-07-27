@@ -12,6 +12,7 @@ namespace lox {
     class Literal;
     class Logical;
     class Unary;
+    class This;
     class Set;
     class Variable;
 
@@ -34,6 +35,8 @@ namespace lox {
         virtual TokenLiteral visitLogicalExpr(const Logical &expr) = 0;
 
         virtual TokenLiteral visitUnaryExpr(const Unary &expr) = 0;
+
+        virtual TokenLiteral visitThisExpr(const This &expr) = 0;
 
         virtual TokenLiteral visitSetExpr(const Set &expr) = 0;
 
@@ -183,6 +186,21 @@ namespace lox {
 
         [[nodiscard]] const Token &getOp() const { return op; }
         [[nodiscard]] const std::shared_ptr<Expr> &getRight() const { return right; }
+    };
+
+    class This final : public Expr {
+        Token keyword;
+
+    public:
+        explicit This(Token keyword)
+            : keyword(std::move(keyword)) {
+        }
+
+        TokenLiteral accept(ExprVisitor &visitor) const override {
+            return visitor.visitThisExpr(*this);
+        }
+
+        [[nodiscard]] const Token &getKeyword() const { return keyword; }
     };
 
     class Set final : public Expr {

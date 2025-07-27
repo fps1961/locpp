@@ -326,6 +326,8 @@ namespace lox {
 
         if (match(NUMBER, STRING)) return std::make_shared<Literal>(previous().getLiteral());
 
+        if (match(THIS)) return std::make_shared<This>(previous());
+
         if (match(IDENTIFIER)) return std::make_shared<Variable>(previous());
 
         if (match(LEFT_PAREN)) {

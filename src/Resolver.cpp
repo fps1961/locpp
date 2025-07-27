@@ -16,14 +16,20 @@ namespace lox {
     }
 
     TokenLiteral Resolver::visitClassStmt(const Class &stmt) {
+        ClassType enclosingClass = currentClass;
+        currentClass = ClassType::CLASS;
         declare(stmt.getName());
         define(stmt.getName());
 
-        for (const auto& method : stmt.getMethods()) {
+        beginScope();
+        scopes.back()["this"] = true;
+
+        for (const auto &method: stmt.getMethods()) {
             auto declaration = FunctionType::METHOD;
             resolveFunction(*method.get(), declaration);
         }
-
+        endScope();
+        currentClass = enclosingClass;
         return {};
     }
 
@@ -133,6 +139,15 @@ namespace lox {
     TokenLiteral Resolver::visitSetExpr(const Set &expr) {
         resolve(expr.getValue());
         resolve(expr.getObject());
+        return {};
+    }
+
+    TokenLiteral Resolver::visitThisExpr(const This &expr) {
+        if (currentClass == ClassType::NONE) {
+            Lox::error(expr.getKeyword(), "Can't use 'this' outside of a class.");
+            return {};
+        }
+        resolveLocal(std::make_shared<This>(expr), expr.getKeyword());
         return {};
     }
 

@@ -187,6 +187,7 @@ int main(const int argc, char *argv[]) {
                   "Literal  : TokenLiteral value",
                   "Logical  : Expr left, Token op, Expr right",
                   "Unary    : Token op, Expr right",
+                  "This  : Token keyword",
                   "Set      : Expr object, Token name, Expr value",
                   "Variable : Token name"
               });

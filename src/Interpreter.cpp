@@ -59,6 +59,10 @@ namespace lox {
         throw new RuntimeError(expr.getName(), "Only Instances have fields.");
     }
 
+    TokenLiteral Interpreter::visitThisExpr(const This &expr) {
+        return lookUpVariable(expr.getKeyword(), std::make_shared<This>(expr));
+    }
+
 
     TokenLiteral Interpreter::visitUnaryExpr(const Unary &expr) {
         const TokenLiteral right = evaluate(expr.getRight());
@@ -301,7 +305,7 @@ namespace lox {
         return std::visit(TokenLiteralToString{}, object);
     }
 
-    TokenLiteral Interpreter::lookUpVariable(const Token &name, const std::shared_ptr<Variable> &token) {
+    TokenLiteral Interpreter::lookUpVariable(const Token &name, const std::shared_ptr<Expr> &token) {
         if (const auto distance = locals.find(token); distance != locals.end()) {
             return environment->getAt(distance->second, name.getLexeme());
         } else {

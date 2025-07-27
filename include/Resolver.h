@@ -17,9 +17,15 @@ namespace lox {
             METHOD
         };
 
+        enum class ClassType {
+            NONE,
+            CLASS
+        };
+
         Interpreter interpreter;
         std::vector<std::unordered_map<std::string, bool> > scopes;
         FunctionType currentFunction = FunctionType::NONE;
+        ClassType currentClass = ClassType::NONE;
 
     public:
         explicit Resolver(const Interpreter &interpreter) : interpreter(interpreter) {
@@ -65,6 +71,7 @@ namespace lox {
 
         TokenLiteral visitSetExpr(const Set &expr) override;
 
+        TokenLiteral visitThisExpr(const This &expr) override;
 
         TokenLiteral visitUnaryExpr(const Unary &expr) override;
 

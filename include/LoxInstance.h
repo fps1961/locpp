@@ -9,7 +9,7 @@ namespace lox {
     class Token;
     class LoxClass;
 
-    class LoxInstance {
+    class LoxInstance : std::enable_shared_from_this<LoxInstance>{
         std::shared_ptr<lox::LoxClass> loxClass;
 
         std::unordered_map<std::string, TokenLiteral> fields;
