@@ -12,11 +12,10 @@
 #include "../include/LoxReturn.h"
 
 namespace lox {
-
     std::shared_ptr<LoxFunction> LoxFunction::bind(const std::shared_ptr<LoxInstance> &loxInstance) {
         auto environment = std::make_shared<Environment>(closure);
         environment->define("this", loxInstance);
-        return std::make_shared<LoxFunction>(declaration, environment);
+        return std::make_shared<LoxFunction>(declaration, environment, isInitializer);
     }
 
 
@@ -33,8 +32,12 @@ namespace lox {
         try {
             interpreter.executeBlock(declaration->getBody(), environment);
         } catch (LoxReturn &returnValue) {
+            if (isInitializer) return closure->getAt(0, "this");
             return returnValue.value;
         }
+
+        if (isInitializer) return closure->getAt(0, "this");
+
         return {};
     }
 

@@ -10,7 +10,7 @@
 
 namespace lox {
     LoxClass::LoxClass(std::string name,
-                       std::unordered_map<std::string, std::shared_ptr<LoxFunction> > &methods): name(std::move(name)),
+                       std::unordered_map<std::string, std::shared_ptr<LoxFunction> > &methods) : name(std::move(name)),
         methods(std::move(methods)) {
     };
 
@@ -22,8 +22,12 @@ namespace lox {
     }
 
 
-    TokenLiteral LoxClass::call(Interpreter &, std::vector<TokenLiteral> &) {
+    TokenLiteral LoxClass::call(Interpreter & interpreter, std::vector<TokenLiteral> & arguments) {
         auto loxInstance = std::make_shared<LoxInstance>(shared_from_this());
+        auto initializer = findMethod("init");
+        if (initializer != nullptr) {
+            initializer->bind(loxInstance)->call(interpreter, arguments);
+        }
         return loxInstance;
     }
 
@@ -31,5 +35,9 @@ namespace lox {
         return name;
     }
 
-    int LoxClass::arity() { return 0; }
+    int LoxClass::arity() {
+        auto initializer = findMethod("init");
+        if (initializer == nullptr) return 0;
+        return initializer->arity();
+    }
 }

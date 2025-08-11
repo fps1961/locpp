@@ -17,13 +17,17 @@ namespace lox {
         std::shared_ptr<Function> declaration;
         std::shared_ptr<Environment> closure;
 
+        bool isInitializer;
+
     public:
         explicit LoxFunction(std::shared_ptr<Function> declaration,
-                             std::shared_ptr<Environment> environment) : declaration(std::move(declaration)),
-                                                                         closure(std::move(environment)) {
+                             std::shared_ptr<Environment> environment,
+                             bool isInitializer) : declaration(std::move(declaration)),
+                                                   closure(std::move(environment)),
+                                                   isInitializer(isInitializer) {
         };
 
-        std::shared_ptr<LoxFunction> bind(const std::shared_ptr<LoxInstance>& loxInstance);
+        std::shared_ptr<LoxFunction> bind(const std::shared_ptr<LoxInstance> &loxInstance);
 
         TokenLiteral call() override;
 

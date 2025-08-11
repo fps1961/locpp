@@ -205,7 +205,8 @@ namespace lox {
 
     TokenLiteral Interpreter::visitFunctionStmt(const Function &stmt) {
         auto function = std::make_shared<LoxFunction>(std::make_shared<Function>(stmt),
-                                                      std::make_shared<Environment>(environment));
+                                                      std::make_shared<Environment>(environment),
+                                                      false);
         environment->define(stmt.getName().getLexeme(), function);
         return {};
     }
@@ -231,7 +232,8 @@ namespace lox {
 
         std::unordered_map<std::string, std::shared_ptr<LoxFunction> > methods{};
         for (const auto &method: stmt.getMethods()) {
-            const auto function = std::make_shared<LoxFunction>(method, environment);
+            const auto function = std::make_shared<LoxFunction>(method, environment,
+                method->getName().getLexeme() == "init");
             methods[method->getName().getLexeme()] = function;
         }
         TokenLiteral klass = std::make_shared<LoxClass>(stmt.getName().getLexeme(), methods);

@@ -26,6 +26,9 @@ namespace lox {
 
         for (const auto &method: stmt.getMethods()) {
             auto declaration = FunctionType::METHOD;
+            if (method->getName().getLexeme() == "init") {
+                declaration = FunctionType::INITIALIZER;
+            }
             resolveFunction(*method.get(), declaration);
         }
         endScope();
@@ -89,6 +92,9 @@ namespace lox {
             Lox::error(stmt.getKeyword(), "Can't return from top-level code.");
         }
         if (stmt.getValue() != nullptr) {
+            if (currentFunction == FunctionType::INITIALIZER) {
+                Lox::error(stmt.getKeyword(), "Can't return a value from an initializer.");
+            }
             resolve(stmt.getValue());
         }
         return {};
