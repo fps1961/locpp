@@ -228,15 +228,34 @@ namespace lox {
     }
 
     TokenLiteral Interpreter::visitClassStmt(const Class &stmt) {
+        std::shared_ptr<LoxClass> superClassPtr = nullptr;
+
+        if (stmt.getSuperclass() != nullptr) {
+            TokenLiteral superClass = evaluate(stmt.getSuperclass());
+
+            if (!std::holds_alternative<std::shared_ptr<LoxClass> >(superClass)) {
+                throw new RuntimeError(stmt.getSuperclass()->getName(),
+                                       "Superclass must be a class.");
+            }
+
+            superClassPtr = std::get<std::shared_ptr<LoxClass> >(superClass);
+        }
+
         environment->define(stmt.getName().getLexeme(), {});
 
         std::unordered_map<std::string, std::shared_ptr<LoxFunction> > methods{};
         for (const auto &method: stmt.getMethods()) {
             const auto function = std::make_shared<LoxFunction>(method, environment,
-                method->getName().getLexeme() == "init");
+                                                                method->getName().getLexeme() == "init");
             methods[method->getName().getLexeme()] = function;
         }
-        TokenLiteral klass = std::make_shared<LoxClass>(stmt.getName().getLexeme(), methods);
+
+        TokenLiteral klass = std::make_shared<LoxClass>(
+            stmt.getName().getLexeme(),
+            superClassPtr,
+            methods
+        );
+
         environment->assign(stmt.getName(), klass);
         return {};
     }

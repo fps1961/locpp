@@ -2,196 +2,176 @@
 #include <memory>
 #include <variant>
 #include "../include/Token.h"
-
 namespace lox {
-    class Block;
-    class Class;
-    class Expression;
-    class Function;
-    class If;
-    class Print;
-    class Return;
-    class Var;
-    class While;
+class Block;
+class Class;
+class Expression;
+class Function;
+class If;
+class Print;
+class Return;
+class Var;
+class While;
+class StmtVisitor {
+public:
+virtual ~StmtVisitor() = default;
+virtual TokenLiteral visitBlockStmt(const Block& stmt) = 0;
+virtual TokenLiteral visitClassStmt(const Class& stmt) = 0;
+virtual TokenLiteral visitExpressionStmt(const Expression& stmt) = 0;
+virtual TokenLiteral visitFunctionStmt(const Function& stmt) = 0;
+virtual TokenLiteral visitIfStmt(const If& stmt) = 0;
+virtual TokenLiteral visitPrintStmt(const Print& stmt) = 0;
+virtual TokenLiteral visitReturnStmt(const Return& stmt) = 0;
+virtual TokenLiteral visitVarStmt(const Var& stmt) = 0;
+virtual TokenLiteral visitWhileStmt(const While& stmt) = 0;
+};
+class Stmt {
+public:
+virtual ~Stmt() = default;
+virtual TokenLiteral accept(StmtVisitor& visitor) const = 0;
+};
+class Block final : public Stmt {
+    std::vector<std::shared_ptr<Stmt>> statements;
 
-    class StmtVisitor {
-    public:
-        virtual ~StmtVisitor() = default;
+public:
+    explicit Block(std::vector<std::shared_ptr<Stmt>> statements)
+        : statements(std::move(statements)) {}
 
-        virtual TokenLiteral visitBlockStmt(const Block &stmt) = 0;
+    TokenLiteral accept(StmtVisitor& visitor) const override {
+        return visitor.visitBlockStmt(*this);
+    }
 
-        virtual TokenLiteral visitClassStmt(const Class &stmt) = 0;
+[[nodiscard]] const std::vector<std::shared_ptr<Stmt>>& getStatements() const { return statements; }
+};
 
-        virtual TokenLiteral visitExpressionStmt(const Expression &stmt) = 0;
+class Class final : public Stmt {
+    Token name;
+    std::shared_ptr<Variable> superclass;
+    std::vector<std::shared_ptr<Function>> methods;
 
-        virtual TokenLiteral visitFunctionStmt(const Function &stmt) = 0;
+public:
+    Class(Token name, std::shared_ptr<Variable> superclass, std::vector<std::shared_ptr<Function>> methods)
+        : name(std::move(name)), superclass(std::move(superclass)), methods(std::move(methods)) {}
 
-        virtual TokenLiteral visitIfStmt(const If &stmt) = 0;
+    TokenLiteral accept(StmtVisitor& visitor) const override {
+        return visitor.visitClassStmt(*this);
+    }
 
-        virtual TokenLiteral visitPrintStmt(const Print &stmt) = 0;
+[[nodiscard]] const Token& getName() const { return name; }
+[[nodiscard]] const std::shared_ptr<Variable>& getSuperclass() const { return superclass; }
+[[nodiscard]] const std::vector<std::shared_ptr<Function>>& getMethods() const { return methods; }
+};
 
-        virtual TokenLiteral visitReturnStmt(const Return &stmt) = 0;
+class Expression final : public Stmt {
+    std::shared_ptr<Expr> expression;
 
-        virtual TokenLiteral visitVarStmt(const Var &stmt) = 0;
+public:
+    explicit Expression(std::shared_ptr<Expr> expression)
+        : expression(std::move(expression)) {}
 
-        virtual TokenLiteral visitWhileStmt(const While &stmt) = 0;
-    };
+    TokenLiteral accept(StmtVisitor& visitor) const override {
+        return visitor.visitExpressionStmt(*this);
+    }
 
-    class Stmt {
-    public:
-        virtual ~Stmt() = default;
+[[nodiscard]] const std::shared_ptr<Expr>& getExpression() const { return expression; }
+};
 
-        virtual TokenLiteral accept(StmtVisitor &visitor) const = 0;
-    };
+class Function final : public Stmt {
+    Token name;
+    std::vector<Token> params;
+    std::vector<std::shared_ptr<Stmt>> body;
 
-    class Block final : public Stmt {
-        std::vector<std::shared_ptr<Stmt> > statements;
+public:
+    Function(Token name, std::vector<Token> params, std::vector<std::shared_ptr<Stmt>> body)
+        : name(std::move(name)), params(std::move(params)), body(std::move(body)) {}
 
-    public:
-        explicit Block(std::vector<std::shared_ptr<Stmt> > statements)
-            : statements(std::move(statements)) {
-        }
+    TokenLiteral accept(StmtVisitor& visitor) const override {
+        return visitor.visitFunctionStmt(*this);
+    }
 
-        TokenLiteral accept(StmtVisitor &visitor) const override {
-            return visitor.visitBlockStmt(*this);
-        }
+[[nodiscard]] const Token& getName() const { return name; }
+[[nodiscard]] const std::vector<Token>& getParams() const { return params; }
+[[nodiscard]] const std::vector<std::shared_ptr<Stmt>>& getBody() const { return body; }
+};
 
-        [[nodiscard]] const std::vector<std::shared_ptr<Stmt> > &getStatements() const { return statements; }
-    };
+class If final : public Stmt {
+    std::shared_ptr<Expr> condition;
+    std::shared_ptr<Stmt> thenBranch;
+    std::shared_ptr<Stmt> elseBranch;
 
-    class Class final : public Stmt {
-        Token name;
-        std::vector<std::shared_ptr<Function> > methods;
+public:
+    If(std::shared_ptr<Expr> condition, std::shared_ptr<Stmt> thenBranch, std::shared_ptr<Stmt> elseBranch)
+        : condition(std::move(condition)), thenBranch(std::move(thenBranch)), elseBranch(std::move(elseBranch)) {}
 
-    public:
-        Class(Token name, std::vector<std::shared_ptr<Function> > methods)
-            : name(std::move(name)), methods(std::move(methods)) {
-        }
+    TokenLiteral accept(StmtVisitor& visitor) const override {
+        return visitor.visitIfStmt(*this);
+    }
 
-        TokenLiteral accept(StmtVisitor &visitor) const override {
-            return visitor.visitClassStmt(*this);
-        }
+[[nodiscard]] const std::shared_ptr<Expr>& getCondition() const { return condition; }
+[[nodiscard]] const std::shared_ptr<Stmt>& getThenBranch() const { return thenBranch; }
+[[nodiscard]] const std::shared_ptr<Stmt>& getElseBranch() const { return elseBranch; }
+};
 
-        [[nodiscard]] const Token &getName() const { return name; }
-        [[nodiscard]] const std::vector<std::shared_ptr<Function> > &getMethods() const { return methods; }
-    };
+class Print final : public Stmt {
+    std::shared_ptr<Expr> expression;
 
-    class Expression final : public Stmt {
-        std::shared_ptr<Expr> expression;
+public:
+    explicit Print(std::shared_ptr<Expr> expression)
+        : expression(std::move(expression)) {}
 
-    public:
-        explicit Expression(std::shared_ptr<Expr> expression)
-            : expression(std::move(expression)) {
-        }
+    TokenLiteral accept(StmtVisitor& visitor) const override {
+        return visitor.visitPrintStmt(*this);
+    }
 
-        TokenLiteral accept(StmtVisitor &visitor) const override {
-            return visitor.visitExpressionStmt(*this);
-        }
+[[nodiscard]] const std::shared_ptr<Expr>& getExpression() const { return expression; }
+};
 
-        [[nodiscard]] const std::shared_ptr<Expr> &getExpression() const { return expression; }
-    };
+class Return final : public Stmt {
+    Token keyword;
+    std::shared_ptr<Expr> value;
 
-    class Function final : public Stmt {
-        Token name;
-        std::vector<Token> params;
-        std::vector<std::shared_ptr<Stmt> > body;
+public:
+    Return(Token keyword, std::shared_ptr<Expr> value)
+        : keyword(std::move(keyword)), value(std::move(value)) {}
 
-    public:
-        Function(Token name, std::vector<Token> params, std::vector<std::shared_ptr<Stmt> > body)
-            : name(std::move(name)), params(std::move(params)), body(std::move(body)) {
-        }
+    TokenLiteral accept(StmtVisitor& visitor) const override {
+        return visitor.visitReturnStmt(*this);
+    }
 
-        TokenLiteral accept(StmtVisitor &visitor) const override {
-            return visitor.visitFunctionStmt(*this);
-        }
+[[nodiscard]] const Token& getKeyword() const { return keyword; }
+[[nodiscard]] const std::shared_ptr<Expr>& getValue() const { return value; }
+};
 
-        [[nodiscard]] const Token &getName() const { return name; }
-        [[nodiscard]] const std::vector<Token> &getParams() const { return params; }
-        [[nodiscard]] const std::vector<std::shared_ptr<Stmt> > &getBody() const { return body; }
-    };
+class Var final : public Stmt {
+    Token name;
+    std::shared_ptr<Expr> initializer;
 
-    class If final : public Stmt {
-        std::shared_ptr<Expr> condition;
-        std::shared_ptr<Stmt> thenBranch;
-        std::shared_ptr<Stmt> elseBranch;
+public:
+    Var(Token name, std::shared_ptr<Expr> initializer)
+        : name(std::move(name)), initializer(std::move(initializer)) {}
 
-    public:
-        If(std::shared_ptr<Expr> condition, std::shared_ptr<Stmt> thenBranch, std::shared_ptr<Stmt> elseBranch)
-            : condition(std::move(condition)), thenBranch(std::move(thenBranch)), elseBranch(std::move(elseBranch)) {
-        }
+    TokenLiteral accept(StmtVisitor& visitor) const override {
+        return visitor.visitVarStmt(*this);
+    }
 
-        TokenLiteral accept(StmtVisitor &visitor) const override {
-            return visitor.visitIfStmt(*this);
-        }
+[[nodiscard]] const Token& getName() const { return name; }
+[[nodiscard]] const std::shared_ptr<Expr>& getInitializer() const { return initializer; }
+};
 
-        [[nodiscard]] const std::shared_ptr<Expr> &getCondition() const { return condition; }
-        [[nodiscard]] const std::shared_ptr<Stmt> &getThenBranch() const { return thenBranch; }
-        [[nodiscard]] const std::shared_ptr<Stmt> &getElseBranch() const { return elseBranch; }
-    };
+class While final : public Stmt {
+    std::shared_ptr<Expr> condition;
+    std::shared_ptr<Stmt> body;
 
-    class Print final : public Stmt {
-        std::shared_ptr<Expr> expression;
+public:
+    While(std::shared_ptr<Expr> condition, std::shared_ptr<Stmt> body)
+        : condition(std::move(condition)), body(std::move(body)) {}
 
-    public:
-        explicit Print(std::shared_ptr<Expr> expression)
-            : expression(std::move(expression)) {
-        }
+    TokenLiteral accept(StmtVisitor& visitor) const override {
+        return visitor.visitWhileStmt(*this);
+    }
 
-        TokenLiteral accept(StmtVisitor &visitor) const override {
-            return visitor.visitPrintStmt(*this);
-        }
+[[nodiscard]] const std::shared_ptr<Expr>& getCondition() const { return condition; }
+[[nodiscard]] const std::shared_ptr<Stmt>& getBody() const { return body; }
+};
 
-        [[nodiscard]] const std::shared_ptr<Expr> &getExpression() const { return expression; }
-    };
-
-    class Return final : public Stmt {
-        Token keyword;
-        std::shared_ptr<Expr> value;
-
-    public:
-        Return(Token keyword, std::shared_ptr<Expr> value)
-            : keyword(std::move(keyword)), value(std::move(value)) {
-        }
-
-        TokenLiteral accept(StmtVisitor &visitor) const override {
-            return visitor.visitReturnStmt(*this);
-        }
-
-        [[nodiscard]] const Token &getKeyword() const { return keyword; }
-        [[nodiscard]] const std::shared_ptr<Expr> &getValue() const { return value; }
-    };
-
-    class Var final : public Stmt {
-        Token name;
-        std::shared_ptr<Expr> initializer;
-
-    public:
-        Var(Token name, std::shared_ptr<Expr> initializer)
-            : name(std::move(name)), initializer(std::move(initializer)) {
-        }
-
-        TokenLiteral accept(StmtVisitor &visitor) const override {
-            return visitor.visitVarStmt(*this);
-        }
-
-        [[nodiscard]] const Token &getName() const { return name; }
-        [[nodiscard]] const std::shared_ptr<Expr> &getInitializer() const { return initializer; }
-    };
-
-    class While final : public Stmt {
-        std::shared_ptr<Expr> condition;
-        std::shared_ptr<Stmt> body;
-
-    public:
-        While(std::shared_ptr<Expr> condition, std::shared_ptr<Stmt> body)
-            : condition(std::move(condition)), body(std::move(body)) {
-        }
-
-        TokenLiteral accept(StmtVisitor &visitor) const override {
-            return visitor.visitWhileStmt(*this);
-        }
-
-        [[nodiscard]] const std::shared_ptr<Expr> &getCondition() const { return condition; }
-        [[nodiscard]] const std::shared_ptr<Stmt> &getBody() const { return body; }
-    };
 }

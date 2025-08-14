@@ -21,6 +21,15 @@ namespace lox {
         declare(stmt.getName());
         define(stmt.getName());
 
+        if (stmt.getSuperclass() != nullptr && stmt.getName().getLexeme() == stmt.getSuperclass()->getName().
+            getLexeme()) {
+            Lox::error(stmt.getSuperclass()->getName(), "A class can't inherit from itself");
+        }
+
+        if (stmt.getSuperclass() != nullptr) {
+            resolve(stmt.getSuperclass());
+        }
+
         beginScope();
         scopes.back()["this"] = true;
 

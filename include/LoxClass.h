@@ -11,12 +11,15 @@ namespace lox {
     class LoxClass : public LoxCallable,
                      public std::enable_shared_from_this<LoxClass> {
         std::string name;
+        std::shared_ptr<LoxClass>& superClass;
         std::unordered_map<std::string, std::shared_ptr<LoxFunction> > methods;
 
     public:
-        explicit LoxClass(std::string name, std::unordered_map<std::string, std::shared_ptr<LoxFunction> > &methods);
+        explicit LoxClass(std::string name,
+                          std::shared_ptr<LoxClass>& superClass,
+                          std::unordered_map<std::string, std::shared_ptr<LoxFunction> > &methods);
 
-        std::shared_ptr<LoxFunction> findMethod(std::string name);
+        std::shared_ptr<LoxFunction> findMethod(std::string aName);
 
         std::string toString() override;
 
