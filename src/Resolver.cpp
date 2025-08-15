@@ -3,6 +3,8 @@
 //
 
 #include "../include/Resolver.h"
+
+#include <cmath>
 #include <unordered_map>
 
 #include "../include/Lox.h"
@@ -27,7 +29,13 @@ namespace lox {
         }
 
         if (stmt.getSuperclass() != nullptr) {
+            currentClass = ClassType::SUBCLASS;
             resolve(stmt.getSuperclass());
+        }
+
+        if (stmt.getSuperclass() != nullptr) {
+            beginScope();
+            scopes.back()["super"] = true;
         }
 
         beginScope();
@@ -41,6 +49,10 @@ namespace lox {
             resolveFunction(*method.get(), declaration);
         }
         endScope();
+
+        if (stmt.getSuperclass() != nullptr) {
+            endScope();
+        }
         currentClass = enclosingClass;
         return {};
     }
@@ -156,6 +168,17 @@ namespace lox {
         resolve(expr.getObject());
         return {};
     }
+
+    TokenLiteral Resolver::visitSuperExpr(const Super &expr) {
+        if (currentClass == ClassType::NONE) {
+            Lox::error(expr.getKeyword(), "Can't use 'super' outside of a class");
+        } else if (currentClass != ClassType::SUBCLASS) {
+            Lox::error(expr.getKeyword(), "Can't use 'super' in a class with no superclass");
+        }
+        resolveLocal(std::make_shared<Super>(expr), expr.getKeyword());
+        return {};
+    }
+
 
     TokenLiteral Resolver::visitThisExpr(const This &expr) {
         if (currentClass == ClassType::NONE) {

@@ -59,6 +59,33 @@ namespace lox {
         throw new RuntimeError(expr.getName(), "Only Instances have fields.");
     }
 
+    TokenLiteral Interpreter::visitSuperExpr(const Super &expr) {
+        const int distance = locals.at(std::make_shared<Super>(expr));
+
+        const TokenLiteral superValue = environment->getAt(distance, "super");
+        const auto superClassPtr = std::get_if<std::shared_ptr<LoxClass> >(&superValue);
+        if (!superClassPtr) {
+            throw RuntimeError(expr.getKeyword(), "Superclass is not a class.");
+        }
+
+        const TokenLiteral thisValue = environment->getAt(distance - 1, "this");
+        const auto objectPtr = std::get_if<std::shared_ptr<LoxInstance> >(&thisValue);
+        if (!objectPtr) {
+            throw RuntimeError(expr.getKeyword(), "'this' is not an instance.");
+        }
+
+        const std::shared_ptr<LoxFunction> method =
+                (*superClassPtr)->findMethod(expr.getMethod().getLexeme());
+
+        if (!method) {
+            throw RuntimeError(expr.getMethod(),
+                               "Undefined property '" + expr.getMethod().getLexeme() + "'.");
+        }
+
+        return method->bind(*objectPtr);
+    }
+
+
     TokenLiteral Interpreter::visitThisExpr(const This &expr) {
         return lookUpVariable(expr.getKeyword(), std::make_shared<This>(expr));
     }
@@ -243,6 +270,11 @@ namespace lox {
 
         environment->define(stmt.getName().getLexeme(), {});
 
+        if (stmt.getSuperclass() != nullptr) {
+            environment = std::make_shared<Environment>(environment);
+            environment->define("super", superClassPtr);
+        }
+
         std::unordered_map<std::string, std::shared_ptr<LoxFunction> > methods{};
         for (const auto &method: stmt.getMethods()) {
             const auto function = std::make_shared<LoxFunction>(method, environment,
@@ -256,6 +288,9 @@ namespace lox {
             methods
         );
 
+        if (stmt.getSuperclass() != nullptr) {
+            environment = environment->enclosing;
+        }
         environment->assign(stmt.getName(), klass);
         return {};
     }

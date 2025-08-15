@@ -27,6 +27,8 @@ namespace lox {
 
         TokenLiteral visitSetExpr(const Set &expr) override;
 
+        TokenLiteral visitSuperExpr(const Super &expr) override;
+
         TokenLiteral visitThisExpr(const This &expr) override;
 
         TokenLiteral visitUnaryExpr(const Unary &expr) override;

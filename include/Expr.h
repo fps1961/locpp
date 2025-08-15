@@ -2,238 +2,230 @@
 #include <memory>
 #include <variant>
 #include "../include/Token.h"
-
 namespace lox {
-    class Assign;
-    class Binary;
-    class Call;
-    class Get;
-    class Grouping;
-    class Literal;
-    class Logical;
-    class Unary;
-    class This;
-    class Set;
-    class Variable;
+class Assign;
+class Binary;
+class Call;
+class Get;
+class Grouping;
+class Literal;
+class Logical;
+class Unary;
+class This;
+class Set;
+class Super;
+class Variable;
+class ExprVisitor {
+public:
+virtual ~ExprVisitor() = default;
+virtual TokenLiteral visitAssignExpr(const Assign& expr) = 0;
+virtual TokenLiteral visitBinaryExpr(const Binary& expr) = 0;
+virtual TokenLiteral visitCallExpr(const Call& expr) = 0;
+virtual TokenLiteral visitGetExpr(const Get& expr) = 0;
+virtual TokenLiteral visitGroupingExpr(const Grouping& expr) = 0;
+virtual TokenLiteral visitLiteralExpr(const Literal& expr) = 0;
+virtual TokenLiteral visitLogicalExpr(const Logical& expr) = 0;
+virtual TokenLiteral visitUnaryExpr(const Unary& expr) = 0;
+virtual TokenLiteral visitThisExpr(const This& expr) = 0;
+virtual TokenLiteral visitSetExpr(const Set& expr) = 0;
+virtual TokenLiteral visitSuperExpr(const Super& expr) = 0;
+virtual TokenLiteral visitVariableExpr(const Variable& expr) = 0;
+};
+class Expr {
+public:
+virtual ~Expr() = default;
+virtual TokenLiteral accept(ExprVisitor& visitor) const = 0;
+};
+class Assign final : public Expr {
+    Token name;
+    std::shared_ptr<Expr> value;
 
-    class ExprVisitor {
-    public:
-        virtual ~ExprVisitor() = default;
+public:
+    Assign(Token name, std::shared_ptr<Expr> value)
+        : name(std::move(name)), value(std::move(value)) {}
 
-        virtual TokenLiteral visitAssignExpr(const Assign &expr) = 0;
+    TokenLiteral accept(ExprVisitor& visitor) const override {
+        return visitor.visitAssignExpr(*this);
+    }
 
-        virtual TokenLiteral visitBinaryExpr(const Binary &expr) = 0;
+[[nodiscard]] const Token& getName() const { return name; }
+[[nodiscard]] const std::shared_ptr<Expr>& getValue() const { return value; }
+};
 
-        virtual TokenLiteral visitCallExpr(const Call &expr) = 0;
+class Binary final : public Expr {
+    std::shared_ptr<Expr> left;
+    Token op;
+    std::shared_ptr<Expr> right;
 
-        virtual TokenLiteral visitGetExpr(const Get &expr) = 0;
+public:
+    Binary(std::shared_ptr<Expr> left, Token op, std::shared_ptr<Expr> right)
+        : left(std::move(left)), op(std::move(op)), right(std::move(right)) {}
 
-        virtual TokenLiteral visitGroupingExpr(const Grouping &expr) = 0;
+    TokenLiteral accept(ExprVisitor& visitor) const override {
+        return visitor.visitBinaryExpr(*this);
+    }
 
-        virtual TokenLiteral visitLiteralExpr(const Literal &expr) = 0;
+[[nodiscard]] const std::shared_ptr<Expr>& getLeft() const { return left; }
+[[nodiscard]] const Token& getOp() const { return op; }
+[[nodiscard]] const std::shared_ptr<Expr>& getRight() const { return right; }
+};
 
-        virtual TokenLiteral visitLogicalExpr(const Logical &expr) = 0;
+class Call final : public Expr {
+    std::shared_ptr<Expr> calle;
+    Token paren;
+    std::vector<std::shared_ptr<Expr>> arguments;
 
-        virtual TokenLiteral visitUnaryExpr(const Unary &expr) = 0;
+public:
+    Call(std::shared_ptr<Expr> calle, Token paren, std::vector<std::shared_ptr<Expr>> arguments)
+        : calle(std::move(calle)), paren(std::move(paren)), arguments(std::move(arguments)) {}
 
-        virtual TokenLiteral visitThisExpr(const This &expr) = 0;
+    TokenLiteral accept(ExprVisitor& visitor) const override {
+        return visitor.visitCallExpr(*this);
+    }
 
-        virtual TokenLiteral visitSetExpr(const Set &expr) = 0;
+[[nodiscard]] const std::shared_ptr<Expr>& getCalle() const { return calle; }
+[[nodiscard]] const Token& getParen() const { return paren; }
+[[nodiscard]] const std::vector<std::shared_ptr<Expr>>& getArguments() const { return arguments; }
+};
 
-        virtual TokenLiteral visitVariableExpr(const Variable &expr) = 0;
-    };
+class Get final : public Expr {
+    std::shared_ptr<Expr> object;
+    Token name;
 
-    class Expr {
-    public:
-        virtual ~Expr() = default;
+public:
+    Get(std::shared_ptr<Expr> object, Token name)
+        : object(std::move(object)), name(std::move(name)) {}
 
-        virtual TokenLiteral accept(ExprVisitor &visitor) const = 0;
-    };
+    TokenLiteral accept(ExprVisitor& visitor) const override {
+        return visitor.visitGetExpr(*this);
+    }
 
-    class Assign final : public Expr {
-        Token name;
-        std::shared_ptr<Expr> value;
+[[nodiscard]] const std::shared_ptr<Expr>& getObject() const { return object; }
+[[nodiscard]] const Token& getName() const { return name; }
+};
 
-    public:
-        Assign(Token name, std::shared_ptr<Expr> value)
-            : name(std::move(name)), value(std::move(value)) {
-        }
+class Grouping final : public Expr {
+    std::shared_ptr<Expr> expression;
 
-        TokenLiteral accept(ExprVisitor &visitor) const override {
-            return visitor.visitAssignExpr(*this);
-        }
+public:
+    explicit Grouping(std::shared_ptr<Expr> expression)
+        : expression(std::move(expression)) {}
 
-        [[nodiscard]] const Token &getName() const { return name; }
-        [[nodiscard]] const std::shared_ptr<Expr> &getValue() const { return value; }
-    };
+    TokenLiteral accept(ExprVisitor& visitor) const override {
+        return visitor.visitGroupingExpr(*this);
+    }
 
-    class Binary final : public Expr {
-        std::shared_ptr<Expr> left;
-        Token op;
-        std::shared_ptr<Expr> right;
+[[nodiscard]] const std::shared_ptr<Expr>& getExpression() const { return expression; }
+};
 
-    public:
-        Binary(std::shared_ptr<Expr> left, Token op, std::shared_ptr<Expr> right)
-            : left(std::move(left)), op(std::move(op)), right(std::move(right)) {
-        }
+class Literal final : public Expr {
+    TokenLiteral value;
 
-        TokenLiteral accept(ExprVisitor &visitor) const override {
-            return visitor.visitBinaryExpr(*this);
-        }
+public:
+    explicit Literal(TokenLiteral value)
+        : value(std::move(value)) {}
 
-        [[nodiscard]] const std::shared_ptr<Expr> &getLeft() const { return left; }
-        [[nodiscard]] const Token &getOp() const { return op; }
-        [[nodiscard]] const std::shared_ptr<Expr> &getRight() const { return right; }
-    };
+    TokenLiteral accept(ExprVisitor& visitor) const override {
+        return visitor.visitLiteralExpr(*this);
+    }
 
-    class Call final : public Expr {
-        std::shared_ptr<Expr> calle;
-        Token paren;
-        std::vector<std::shared_ptr<Expr> > arguments;
+[[nodiscard]] const TokenLiteral& getValue() const { return value; }
+};
 
-    public:
-        Call(std::shared_ptr<Expr> calle, Token paren, std::vector<std::shared_ptr<Expr> > arguments)
-            : calle(std::move(calle)), paren(std::move(paren)), arguments(std::move(arguments)) {
-        }
+class Logical final : public Expr {
+    std::shared_ptr<Expr> left;
+    Token op;
+    std::shared_ptr<Expr> right;
 
-        TokenLiteral accept(ExprVisitor &visitor) const override {
-            return visitor.visitCallExpr(*this);
-        }
+public:
+    Logical(std::shared_ptr<Expr> left, Token op, std::shared_ptr<Expr> right)
+        : left(std::move(left)), op(std::move(op)), right(std::move(right)) {}
 
-        [[nodiscard]] const std::shared_ptr<Expr> &getCalle() const { return calle; }
-        [[nodiscard]] const Token &getParen() const { return paren; }
-        [[nodiscard]] const std::vector<std::shared_ptr<Expr> > &getArguments() const { return arguments; }
-    };
+    TokenLiteral accept(ExprVisitor& visitor) const override {
+        return visitor.visitLogicalExpr(*this);
+    }
 
-    class Get final : public Expr {
-        std::shared_ptr<Expr> object;
-        Token name;
+[[nodiscard]] const std::shared_ptr<Expr>& getLeft() const { return left; }
+[[nodiscard]] const Token& getOp() const { return op; }
+[[nodiscard]] const std::shared_ptr<Expr>& getRight() const { return right; }
+};
 
-    public:
-        Get(std::shared_ptr<Expr> object, Token name)
-            : object(std::move(object)), name(std::move(name)) {
-        }
+class Unary final : public Expr {
+    Token op;
+    std::shared_ptr<Expr> right;
 
-        TokenLiteral accept(ExprVisitor &visitor) const override {
-            return visitor.visitGetExpr(*this);
-        }
+public:
+    Unary(Token op, std::shared_ptr<Expr> right)
+        : op(std::move(op)), right(std::move(right)) {}
 
-        [[nodiscard]] const std::shared_ptr<Expr> &getObject() const { return object; }
-        [[nodiscard]] const Token &getName() const { return name; }
-    };
+    TokenLiteral accept(ExprVisitor& visitor) const override {
+        return visitor.visitUnaryExpr(*this);
+    }
 
-    class Grouping final : public Expr {
-        std::shared_ptr<Expr> expression;
+[[nodiscard]] const Token& getOp() const { return op; }
+[[nodiscard]] const std::shared_ptr<Expr>& getRight() const { return right; }
+};
 
-    public:
-        explicit Grouping(std::shared_ptr<Expr> expression)
-            : expression(std::move(expression)) {
-        }
+class This final : public Expr {
+    Token keyword;
 
-        TokenLiteral accept(ExprVisitor &visitor) const override {
-            return visitor.visitGroupingExpr(*this);
-        }
+public:
+    explicit This(Token keyword)
+        : keyword(std::move(keyword)) {}
 
-        [[nodiscard]] const std::shared_ptr<Expr> &getExpression() const { return expression; }
-    };
+    TokenLiteral accept(ExprVisitor& visitor) const override {
+        return visitor.visitThisExpr(*this);
+    }
 
-    class Literal final : public Expr {
-        TokenLiteral value;
+[[nodiscard]] const Token& getKeyword() const { return keyword; }
+};
 
-    public:
-        explicit Literal(TokenLiteral value)
-            : value(std::move(value)) {
-        }
+class Set final : public Expr {
+    std::shared_ptr<Expr> object;
+    Token name;
+    std::shared_ptr<Expr> value;
 
-        TokenLiteral accept(ExprVisitor &visitor) const override {
-            return visitor.visitLiteralExpr(*this);
-        }
+public:
+    Set(std::shared_ptr<Expr> object, Token name, std::shared_ptr<Expr> value)
+        : object(std::move(object)), name(std::move(name)), value(std::move(value)) {}
 
-        [[nodiscard]] const TokenLiteral &getValue() const { return value; }
-    };
+    TokenLiteral accept(ExprVisitor& visitor) const override {
+        return visitor.visitSetExpr(*this);
+    }
 
-    class Logical final : public Expr {
-        std::shared_ptr<Expr> left;
-        Token op;
-        std::shared_ptr<Expr> right;
+[[nodiscard]] const std::shared_ptr<Expr>& getObject() const { return object; }
+[[nodiscard]] const Token& getName() const { return name; }
+[[nodiscard]] const std::shared_ptr<Expr>& getValue() const { return value; }
+};
 
-    public:
-        Logical(std::shared_ptr<Expr> left, Token op, std::shared_ptr<Expr> right)
-            : left(std::move(left)), op(std::move(op)), right(std::move(right)) {
-        }
+class Super final : public Expr {
+    Token keyword;
+    Token method;
 
-        TokenLiteral accept(ExprVisitor &visitor) const override {
-            return visitor.visitLogicalExpr(*this);
-        }
+public:
+    Super(Token keyword, Token method)
+        : keyword(std::move(keyword)), method(std::move(method)) {}
 
-        [[nodiscard]] const std::shared_ptr<Expr> &getLeft() const { return left; }
-        [[nodiscard]] const Token &getOp() const { return op; }
-        [[nodiscard]] const std::shared_ptr<Expr> &getRight() const { return right; }
-    };
+    TokenLiteral accept(ExprVisitor& visitor) const override {
+        return visitor.visitSuperExpr(*this);
+    }
 
-    class Unary final : public Expr {
-        Token op;
-        std::shared_ptr<Expr> right;
+[[nodiscard]] const Token& getKeyword() const { return keyword; }
+[[nodiscard]] const Token& getMethod() const { return method; }
+};
 
-    public:
-        Unary(Token op, std::shared_ptr<Expr> right)
-            : op(std::move(op)), right(std::move(right)) {
-        }
+class Variable final : public Expr {
+    Token name;
 
-        TokenLiteral accept(ExprVisitor &visitor) const override {
-            return visitor.visitUnaryExpr(*this);
-        }
+public:
+    explicit Variable(Token name)
+        : name(std::move(name)) {}
 
-        [[nodiscard]] const Token &getOp() const { return op; }
-        [[nodiscard]] const std::shared_ptr<Expr> &getRight() const { return right; }
-    };
+    TokenLiteral accept(ExprVisitor& visitor) const override {
+        return visitor.visitVariableExpr(*this);
+    }
 
-    class This final : public Expr {
-        Token keyword;
+[[nodiscard]] const Token& getName() const { return name; }
+};
 
-    public:
-        explicit This(Token keyword)
-            : keyword(std::move(keyword)) {
-        }
-
-        TokenLiteral accept(ExprVisitor &visitor) const override {
-            return visitor.visitThisExpr(*this);
-        }
-
-        [[nodiscard]] const Token &getKeyword() const { return keyword; }
-    };
-
-    class Set final : public Expr {
-        std::shared_ptr<Expr> object;
-        Token name;
-        std::shared_ptr<Expr> value;
-
-    public:
-        Set(std::shared_ptr<Expr> object, Token name, std::shared_ptr<Expr> value)
-            : object(std::move(object)), name(std::move(name)), value(std::move(value)) {
-        }
-
-        TokenLiteral accept(ExprVisitor &visitor) const override {
-            return visitor.visitSetExpr(*this);
-        }
-
-        [[nodiscard]] const std::shared_ptr<Expr> &getObject() const { return object; }
-        [[nodiscard]] const Token &getName() const { return name; }
-        [[nodiscard]] const std::shared_ptr<Expr> &getValue() const { return value; }
-    };
-
-    class Variable final : public Expr {
-        Token name;
-
-    public:
-        explicit Variable(Token name)
-            : name(std::move(name)) {
-        }
-
-        TokenLiteral accept(ExprVisitor &visitor) const override {
-            return visitor.visitVariableExpr(*this);
-        }
-
-        [[nodiscard]] const Token &getName() const { return name; }
-    };
 }

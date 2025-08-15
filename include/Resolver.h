@@ -20,7 +20,8 @@ namespace lox {
 
         enum class ClassType {
             NONE,
-            CLASS
+            CLASS,
+            SUBCLASS
         };
 
         Interpreter interpreter;
@@ -71,6 +72,8 @@ namespace lox {
         TokenLiteral visitLogicalExpr(const Logical &expr) override;
 
         TokenLiteral visitSetExpr(const Set &expr) override;
+
+        TokenLiteral visitSuperExpr(const Super &expr) override;
 
         TokenLiteral visitThisExpr(const This &expr) override;
 

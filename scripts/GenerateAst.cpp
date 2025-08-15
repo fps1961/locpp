@@ -189,6 +189,7 @@ int main(const int argc, char *argv[]) {
                   "Unary    : Token op, Expr right",
                   "This  : Token keyword",
                   "Set      : Expr object, Token name, Expr value",
+                  "Super    : Token keyword, Token method",
                   "Variable : Token name"
               });
     defineAst(outputDir, "Stmt", {

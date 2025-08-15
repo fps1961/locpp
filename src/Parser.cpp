@@ -332,6 +332,13 @@ namespace lox {
 
         if (match(NUMBER, STRING)) return std::make_shared<Literal>(previous().getLiteral());
 
+        if (match(SUPER)) {
+            Token keyword = previous();
+            consume(DOT, "Expect '.' after 'super'.");
+            Token method = consume(IDENTIFIER, "Expect superclass method name");
+            return std::make_shared<Super>(keyword, method);
+        }
+
         if (match(THIS)) return std::make_shared<This>(previous());
 
         if (match(IDENTIFIER)) return std::make_shared<Variable>(previous());
